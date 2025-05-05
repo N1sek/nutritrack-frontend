@@ -1,43 +1,59 @@
-import {Component, OnInit} from '@angular/core';
-import {AuthService} from '../../../core/auth.service';
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {NavbarComponent} from "../../../shared/components/navbar/navbar.component";
+import { Component, inject } from '@angular/core';
+import { AuthService } from '../../../core/auth/auth.service';
+import {FormsModule} from '@angular/forms';
+import {NavbarComponent} from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-login',
-    imports: [
-        FormsModule,
-        NavbarComponent,
-        ReactiveFormsModule,
-    ],
+  standalone: true,
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
+  imports: [
+    FormsModule,
+    NavbarComponent
+  ]
 })
-export class LoginComponent implements OnInit{
+export class LoginComponent {
+  private authService = inject(AuthService);
 
-  constructor(private authService: AuthService) {
-  }
-
-  email: string = '';
-  password: string = '';
-
-  ngOnInit() {
-    alert(`Las credenciales son: 'test@example.com' y password: 123`)
-  }
+  email = '';
+  password = '';
+  error: string | null = null;
+  loading = false;
 
   login() {
-    const hardcodedEmail = 'test@example.com';
-    const hardcodedPassword = '123';
-
-    console.log('Email ingresado:', this.email);
-    console.log('Password ingresado:', this.password);
-
-    if (this.email === hardcodedEmail && this.password === hardcodedPassword) {
-      console.log('Login exitoso');
-      return this.authService.login();
-    } else {
-      alert('Correo o contraseña incorrectos');
+    if (!this.email || !this.password) {
+      this.showError('Por favor, completa todos los campos.');
+      return;
     }
+
+    this.loading = true;
+    this.error = null;
+
+    this.authService.login(this.email, this.password).subscribe({
+      next: () => {
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+
+        if (err.status === 400) {
+          this.showError(err.error?.message || 'Correo o contraseña incorrectos.');
+        } else if (err.status === 0) {
+          this.showError('No se pudo conectar al servidor. Verifica tu conexión.');
+        } else {
+          this.showError('Ocurrió un error inesperado. Intenta nuevamente.');
+        }
+
+        console.error('Error al iniciar sesión:', err);
+      }
+    });
   }
 
+  private showError(message: string) {
+    this.error = message;
+    setTimeout(() => {
+      this.error = null;
+    }, 4000);
+  }
 }

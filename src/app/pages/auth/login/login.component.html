@@ -40,4 +40,15 @@
   </div>
 </div>
 
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+  @if (error) {
+    <div class="toast show bg-danger text-white" role="alert">
+      <div class="toast-body">
+        {{ error }}
+      </div>
+    </div>
+  }
+</div>
+
+
 

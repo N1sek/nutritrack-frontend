@@ -5,77 +5,95 @@
     <div class="col-md-8 col-lg-6">
       <h3 class="mb-4 text-center">⚙️ Ajustes de Perfil</h3>
 
+      @if (error) {
+        <div class="alert alert-danger">{{ error }}</div>
+      }
+
+      @if (success) {
+        <div class="alert alert-success">{{ success }}</div>
+      }
+
       <div class="card shadow-sm">
         <div class="card-body">
           <h5 class="card-title text-center mb-3">👤 Información Personal</h5>
 
-          <!-- Imagen de Perfil -->
           <div class="text-center mb-3">
-            <img [src]="user.imageUrl || 'assets/img/default-avatar.png'" class="rounded-circle" style="width: 120px; height: 120px;">
+            @if (user) {
+              <img [src]="user.imageUrl || 'assets/img/default-avatar.png'" class="rounded-circle" style="width: 120px; height: 120px;">
+            }
             <input type="file" class="form-control mt-2" (change)="uploadImage($event)">
           </div>
 
-          <form (ngSubmit)="saveProfile()">
-            <div class="mb-3">
-              <label class="form-label">Nombre</label>
-              <input type="text" class="form-control" [(ngModel)]="user.name" name="name">
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Correo Electrónico</label>
-              <input type="email" class="form-control" [(ngModel)]="user.email" name="email" disabled>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Peso (kg)</label>
-              <input type="number" class="form-control" [(ngModel)]="user.weight" name="weight">
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Altura (cm)</label>
-              <input type="number" class="form-control" [(ngModel)]="user.height" name="height">
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Edad</label>
-              <input type="number" class="form-control" [(ngModel)]="user.age" name="age">
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Objetivo</label>
-              <select class="form-select" [(ngModel)]="user.goal" name="goal">
-                <option value="perder_peso">Perder Peso</option>
-                <option value="mantener_peso">Mantener Peso</option>
-                <option value="ganar_masa">Ganar Masa Muscular</option>
-              </select>
-            </div>
-
-            <!-- Alérgenos -->
-            <div class="mb-3">
-              <label class="form-label">Alergenos</label>
-              <div class="row">
-                @for (allergen of allergens; track allergen) {
-                  <div class="col-6">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox"
-                             [id]="'allergen' + allergen.name"
-                             [(ngModel)]="user.allergens[allergen.name]"
-                             name="allergens">
-                      <label class="form-check-label" [for]="'allergen' + allergen.name">
-                        {{ allergen.icon }} {{ allergen.name }}
-                      </label>
-                    </div>
-                  </div>
-                }
+          @if (user) {
+            <form (ngSubmit)="saveProfile()">
+              <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-control" [(ngModel)]="user.name" name="name">
               </div>
-            </div>
 
-            <button type="submit" class="btn btn-primary w-100">💾 Guardar Cambios</button>
-          </form>
+              <div class="mb-3">
+                <label class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" [(ngModel)]="user.email" name="email" disabled>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Peso (kg)</label>
+                <input type="number" class="form-control" [(ngModel)]="user.weight" name="weight">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Altura (cm)</label>
+                <input type="number" class="form-control" [(ngModel)]="user.height" name="height">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Edad</label>
+                <input type="number" class="form-control" [(ngModel)]="user.age" name="age">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Objetivo</label>
+                <select class="form-select" [(ngModel)]="user.goal" name="goal">
+                  <option value="GAIN">Ganar Masa Muscular</option>
+                  <option value="MAINTAIN">Mantener Peso</option>
+                  <option value="LOSE">Perder Peso</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Nivel de Actividad</label>
+                <select class="form-select" [(ngModel)]="user.activityLevel" name="activityLevel">
+                  <option value="SEDENTARY">Sedentario</option>
+                  <option value="MODERATE">Moderado</option>
+                  <option value="ACTIVE">Activo</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Alergenos</label>
+                <div class="row">
+                  @for (allergen of allergens; track allergen) {
+                    <div class="col-6">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               [id]="'allergen' + allergen.name"
+                               [(ngModel)]="user.allergens[allergen.name]"
+                               [name]="'allergens' + allergen.name">
+                        <label class="form-check-label" [for]="'allergen' + allergen.name">
+                          {{ allergen.icon }} {{ allergen.name }}
+                        </label>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100">💾 Guardar Cambios</button>
+            </form>
+          }
         </div>
       </div>
 
-      <!-- Opciones de cuenta -->
       <div class="card shadow-sm mt-4">
         <div class="card-body text-center">
           <h5 class="card-title">🔑 Seguridad</h5>

@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { LandingComponent } from './pages/landing/landing.component';
 import {DashboardComponent} from './pages/dashboard/dashboard.component';
-import {authGuard} from './core/auth.guard';
+import {authGuard} from './core/auth/auth.guard';
 import {LoginComponent} from './pages/auth/login/login.component';
 import {RegisterComponent} from './pages/auth/register/register.component';
 import {DiarioNutricionComponent} from './pages/dashboard/diario-nutricion/diario-nutricion.component';
@@ -13,10 +13,10 @@ export const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] }, //, canActivate: [authGuard]
-  { path: 'diario-nutricion', component: DiarioNutricionComponent },
-  { path: 'recetas', component: RecetasComponent },
-  { path: 'informes', component: InformesComponent },
-  { path: 'perfil', component: PerfilComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'diario-nutricion', component: DiarioNutricionComponent, canActivate: [authGuard] },
+  { path: 'recetas', component: RecetasComponent, canActivate: [authGuard] },
+  { path: 'informes', component: InformesComponent, canActivate: [authGuard] },
+  { path: 'perfil', component: PerfilComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
