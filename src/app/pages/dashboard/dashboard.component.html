@@ -1,0 +1,103 @@
+<app-navbar></app-navbar>
+
+<main class="container-xxl py-5">
+  <h3 class="mb-4">Bienvenido, Denis👋</h3>
+
+  <!-- Tarjetas de resumen -->
+  <div class="row g-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm p-3 text-center">
+        <h5 class="mb-1">🔥 Calorías consumidas</h5>
+        <p class="fs-4 fw-bold text-primary">{{ caloriasConsumidas }} kcal</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm p-3 text-center">
+        <h5 class="mb-1">🥩 Proteínas</h5>
+        <p class="fs-4 fw-bold text-success">{{ proteinasConsumidas }}g</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm p-3 text-center">
+        <h5 class="mb-1">🍞 Carbohidratos</h5>
+        <p class="fs-4 fw-bold text-warning">{{ carbohidratosConsumidos }}g</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm p-3 text-center">
+        <h5 class="mb-1">🧈 Grasas</h5>
+        <p class="fs-4 fw-bold text-danger">{{ grasasConsumidas }}g</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Últimos alimentos añadidos -->
+  <div class="row g-4 mt-4">
+    <div class="col-md-6">
+      <!-- Lista de alimentos consumidos en el día -->
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">🍽️ Ultimas comidas registradas</h5>
+        <ul class="list-group">
+          @for (comida of ultimasComidas; track comida.id) {
+            <li class="list-group-item d-flex align-items-center">
+              <!-- Imagen del alimento con fallback a placeholder -->
+              <img [src]="comida.imagen || 'https://placehold.co/80x80'"
+                   class="rounded me-3"
+                   style="width: 80px; height: 80px;"
+                   [alt]="comida.nombre"
+                   (error)="comida.imagen = 'https://placehold.co/80x80'">
+
+              <div class="flex-grow-1">
+                <h6 class="mb-1">{{ comida.nombre }}</h6>
+                <small class="text-muted">{{ comida.cantidad }}</small>
+                <p class="mb-0">🔥 {{ comida.calorias }} kcal | 🥩 {{ comida.proteinas }}g | 🍞 {{ comida.carbohidratos }}g | 🧈 {{ comida.grasas }}g</p>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Balance Nutricional -->
+    <div class="col-md-6">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">🎯 Balance Nutricional</h5>
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between">
+            🔥 Calorías restantes
+            <span class="badge bg-primary">{{ caloriasRestantes }} kcal</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            🥩 Proteínas restantes
+            <span class="badge bg-success">{{ proteinasRestantes }} g</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            🍞 Carbohidratos restantes
+            <span class="badge bg-warning">{{ carbohidratosRestantes }} g</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            🧈 Grasas restantes
+            <span class="badge bg-danger">{{ grasasRestantes }} g</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de gráficos (última en la página) -->
+  <div class="row g-4 mt-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">📊 Consumo de Calorías</h5>
+        <canvas id="caloriasChart"></canvas>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">⚖️ Evolución del Peso</h5>
+        <canvas id="pesoChart"></canvas>
+      </div>
+    </div>
+  </div>
+</main>

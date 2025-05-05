@@ -1,0 +1,73 @@
+<app-navbar></app-navbar>
+
+<main class="container-xxl py-5">
+  <h3 class="mb-4 d-flex justify-content-between">
+    🍽️Recetas
+    <button class="btn btn-outline-primary" (click)="toggleView()">
+      <i class="bi" [class.bi-grid]="isGridView" [class.bi-list]="!isGridView"></i>
+    </button>
+  </h3>
+
+  <!-- Filtros -->
+  <app-recipe-filters (filtersChanged)="applyFilters($event)"></app-recipe-filters>
+
+  <!-- MODO GRID -->
+  @if (isGridView) {
+    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
+      <div class="col">
+        <div class="card h-100 position-relative" style="min-height: 300px">
+          <div class="position-absolute top-0 start-0 w-100 h-100"
+                    style="background: url('/assets/img/crear-receta.jpg') center/cover; opacity: 0.3; border-radius: inherit;"></div>
+          <div class="position-absolute top-50 start-50 translate-middle">
+            <button class="btn btn-light btn-lg rounded-circle">
+              <i class="bi bi-plus-lg fs-1 text-primary"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      @for (recipe of filteredRecipes; track recipe) {
+        <app-recipe-card
+          [name]="recipe.name"
+          [calories]="recipe.calories"
+          [proteins]="recipe.proteins"
+          [carbs]="recipe.carbs"
+          [fats]="recipe.fats"
+          [imageUrl]="recipe.imageUrl"
+          [tags]="recipe.tags"
+          [mealType]="recipe.mealType"
+          [isFavorite]="recipe.isFavorite">
+        </app-recipe-card>
+      }
+    </div>
+  }
+
+  <!-- MODO LISTA -->
+  @if (!isGridView) {
+    <div class="d-flex flex-column">
+
+      <!-- Agregar nueva receta en modo lista -->
+      <div class="d-flex align-items-center border-bottom py-2">
+        <button class="btn btn-outline-primary w-100 d-flex justify-content-center align-items-center py-3">
+          <i class="bi bi-plus-lg me-2"></i> Crear nueva receta
+        </button>
+      </div>
+
+      @for (recipe of filteredRecipes; track recipe) {
+        <app-recipe-list
+          [name]="recipe.name"
+          [calories]="recipe.calories"
+          [proteins]="recipe.proteins"
+          [carbs]="recipe.carbs"
+          [fats]="recipe.fats"
+          [imageUrl]="recipe.imageUrl"
+          [tags]="recipe.tags"
+          [mealType]="recipe.mealType"
+          [isFavorite]="recipe.isFavorite">
+        </app-recipe-list>
+      }
+
+    </div>
+  }
+
+</main>

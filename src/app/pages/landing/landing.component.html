@@ -1,0 +1,122 @@
+<app-navbar></app-navbar>
+
+<!-- Hero Section -->
+<section class="hero d-flex min-vh-100 bg-light position-relative" style="margin-top: 60px;">
+  <div class="container-xxl d-flex flex-column position-relative">
+    <div class="row align-items-center mt-5 pt-5">
+      <!-- Columna Izquierda -->
+      <div class="col-lg-6 text-lg-start text-center text-md-center position-relative z-2">
+        <h1 class="fw-bold text-lg-start text-center w-100" style="z-index: 2;">
+          Alcanza tus metas de nutrición de forma inteligente.
+        </h1>
+        <p class="text-lg-start text-center">
+          NutriTrack te ayuda a planificar dietas
+          personalizadas adaptadas a tus objetivos,
+          preferencias y estilo de vida. ¡Empieza ahora y
+          descubre la mejor versión de ti!
+        </p>
+        <button (click)="goToRegister()" class="btn btn-primary text-white btn-md mx-auto d-lg-inline-block">Empieza ahora</button>
+      </div>
+      <!-- Columna Derecha -->
+      <div class="col-lg-6 text-center z-1">
+        <img
+          src="assets/img/image-hero.png"
+          class="img-fluid hero-img"
+          alt="Imagen Hero"
+          priority="true"
+          height="549" width="592"/>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Features Section -->
+
+<section class="mt-5 mb-5 text-center">
+  <h2 class="mb-5">
+    Sin importar tus metas, NutriTrack te ayudara a alcanzarlas
+  </h2>
+  <div
+    class="container-xxl d-flex justify-content-center flex-wrap gap-5"
+  >
+    <div class="card rounded-5" style="width: 18rem">
+      <img
+        src="assets/img/card1.png"
+        class="card-img-top h-100 img-fluid rounded-5"
+        alt="..."
+      />
+      <div class="card-body">
+        <h5 class="card-title">Planifica tu día</h5>
+        <p class="card-text">
+          Organiza tus comidas diarias y establece metas nutricionales adaptadas a tus necesidades
+        </p>
+      </div>
+    </div>
+
+    <div class="card rounded-5" style="width: 18rem">
+      <img
+        src="assets/img/card4.png"
+        class="card-img-top h-100 img-fluid rounded-5"
+        alt="..."
+      />
+      <div class="card-body">
+        <h5 class="card-title">Recetas Personalizadas</h5>
+        <p class="card-text">
+          Crea, guarda y disfruta de recetas que se ajustan a tus objetivos y preferencias alimenticias
+        </p>
+      </div>
+    </div>
+
+    <div class="card rounded-5" style="width: 18rem">
+      <img
+        src="assets/img/card3.png"
+        class="card-img-top h-100 img-fluid rounded-5"
+        alt="..."
+      />
+      <div class="card-body">
+        <h5 class="card-title">Monitorea tu Progreso</h5>
+        <p class="card-text">
+          Registra tus alimentos, calcula nutrientes y visualiza informes para alcanzar tus metas de salud
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-primary text-white py-4">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6">
+        <h3>NutriTrack</h3>
+        <ul class="list-unstyled d-flex">
+          <li>
+            <a href="#" class="text-white me-3">Cookies</a>
+          </li>
+          <li>
+            <a href="#" class="text-white me-3">Terminos de uso</a>
+          </li>
+          <li>
+            <a href="#" class="text-white me-3">Politica de privacidad</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-lg-6">
+        <h3>Suscribete a nuestro boletín</h3>
+        <form action="">
+          <div class="input-group mb-3">
+            <input
+              type="email"
+              class="form-control"
+              placeholder="Correo electrónico"
+            />
+            <button
+              class="btn btn-light text-primary"
+              type="submit"
+            >
+              Suscribirse
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</footer>

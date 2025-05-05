@@ -1,0 +1,82 @@
+@if (!isLoggedIn()) {
+  <nav class="navbar navbar-expand-sm bg-white shadow-sm fixed-top">
+    <div class="container-xxl">
+      <a class="navbar-brand fw-bold text-dark fs-4 " href="#" (click)="info()" role="button">
+        NutriTrack
+      </a>
+
+      <!-- Menu hamburguesa móviles -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Contenido del navbar -->
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav d-flex gap-2">
+          <li class="nav-item">
+            <button class="btn btn-light text-dark" (click)="goToLogin()">Iniciar sesión</button>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-primary text-white" (click)="goToRegister()">Registro</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+} @else {
+  <nav class="navbar navbar-expand-sm bg-white shadow-sm fixed-top">
+    <div class="container-xxl">
+      <a class="navbar-brand fw-bold text-dark fs-4 cursor-pointer" (click)="goToHome()" role="button">NutriTrack</a>
+
+      <!-- Menu hamburguesa móviles -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavLoggedIn"
+              aria-controls="navbarNavLoggedIn" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Contenido del navbar -->
+      <div class="collapse navbar-collapse" id="navbarNavLoggedIn">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item me-3">
+            <a class="nav-link" routerLink="/dashboard" routerLinkActive="link-primary" (click)="goToHome()">Inicio</a>
+          </li>
+          <li class="nav-item me-3">
+            <a class="nav-link" routerLink="/diario-nutricion" routerLinkActive="link-primary" (click)="goToDiarioNutricion()">Mis comidas</a>
+          </li>
+          <li class="nav-item me-3">
+            <a class="nav-link" href="#" routerLink="/recetas" routerLinkActive="link-primary">Recetas</a>
+          </li>
+          <li class="nav-item me-3">
+            <a class="nav-link" href="#" routerLink="/informes" routerLinkActive="link-primary">Informes</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav d-none d-sm-flex">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false">
+              <img src="https://img.cryptorank.io/coins/arab_cat1706520810607.png" class="rounded-circle" width="30" height="30" alt="Avatar">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <li><a class="dropdown-item" (click)="goToPerfil()" role="button">Ajustes</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item text-danger" href="#" (click)="logout()" role="button">Cerrar sesión <i class="bi bi-box-arrow-right mx-2"></i></a></li>
+            </ul>
+          </li>
+        </ul>
+        <ul class="navbar-nav d-flex d-sm-none w-100 mt-3">
+          <li class="nav-item w-100 d-flex justify-content-between align-items-center px-3 py-2 border-top">
+            <a class="nav-link d-flex align-items-center" (click)="goToPerfil()" role="button">
+              <i class="bi bi-gear me-2"></i> Ajustes
+            </a>
+            <a class="nav-link text-danger d-flex align-items-center" href="#" (click)="logout()" role="button">
+              <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+}

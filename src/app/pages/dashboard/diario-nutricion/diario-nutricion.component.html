@@ -1,0 +1,68 @@
+<app-navbar></app-navbar>
+
+<main class="container-xxl py-5">
+  <h3 class="mb-4 text-center">🍽️ Mis Comidas</h3>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <app-box>
+        <h5 class="mb-3 text-center">📅 Hoy <i class="bi bi-chevron-down"></i></h5>
+
+        @for (meal of ['Desayuno', 'Comida', 'Almuerzo', 'Cena']; track meal) {
+          <div class="mb-4">
+            <div class="bg-primary text-white p-2 rounded-3">
+              <h5 class="mb-0">{{ meal }}</h5>
+            </div>
+
+            @for (comida of comidas; track comida.id) {
+              <div class="d-flex align-items-center bg-light px-3 py-2 rounded-3 mb-2">
+                <img [src]="comida.imagen || 'https://placehold.co/80x80'" class="rounded me-3" style="width: 80px; height: 80px;" [alt]="comida.nombre" (error)="comida.imagen = 'https://placehold.co/80x80'">
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">{{ comida.nombre }}</h6>
+                  <small class="text-muted">{{ comida.cantidad }}</small>
+                  <p class="mb-0">🔥 {{ comida.calorias }} kcal | 🥩 {{ comida.proteinas }}g | 🍞 {{ comida.carbohidratos }}g | 🧈 {{ comida.grasas }}g</p>
+                </div>
+                <div class="d-flex">
+                  <button class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-pencil-square"></i></button>
+                  <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </div>
+            }
+
+            <button class="btn btn-primary btn-sm mt-2">Añadir comida</button>
+          </div>
+        }
+
+        <!-- Total de Nutrientes Consumidos -->
+        <div class="p-3 mt-3 bg-light rounded-3 text-center">
+          <h5 class="mb-2">📊 Total de Nutrientes Consumidos</h5>
+          <p class="mb-0">🔥 {{ totalNutrientes.calorias }} kcal | 🥩 {{ totalNutrientes.proteinas }}g | 🍞 {{ totalNutrientes.carbohidratos }}g | 🧈 {{ totalNutrientes.grasas }}g</p>
+        </div>
+      </app-box>
+    </div>
+  </div>
+
+  <!-- Sección de Recomendaciones -->
+  <div class="row justify-content-center mt-5">
+    <div class="col-lg-8">
+      <app-box>
+        <h4 class="text-center">✨ Recetas Recomendadas</h4>
+        <div class="row">
+          @for (rec of recomendaciones; track rec.id) {
+            <div class="col-md-4 d-flex align-items-stretch">
+              <div class="card shadow-sm p-2 w-100">
+                <img [src]="rec.imagen" class="card-img-top rounded" style="height: 120px; object-fit: cover;">
+                <div class="card-body text-center d-flex flex-column">
+                  <h6 class="card-title">{{ rec.nombre }}</h6>
+                  <p class="text-muted small flex-grow-1">🔥 {{ rec.calorias }} kcal | 🥩 {{ rec.proteinas }}g | 🍞 {{ rec.carbohidratos }}g | 🧈 {{ rec.grasas }}g</p>
+                  <p class="text-muted small flex-grow-1">Ingredientes: {{ rec.ingredientes.join(', ') }}</p>
+                  <p class="small flex-grow-1">{{ rec.preparacion }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </app-box>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,13 @@
+<div class="d-flex align-items-center border-bottom py-2" data-bs-toggle="modal" data-bs-target="#modalReceta">
+  <img [src]="imageUrl" class="rounded me-3" style="width: 80px; height: 80px;" [alt]="name">
+  <div class="flex-grow-1">
+    <h6 class="mb-1">{{ name }}</h6>
+    <p class="mb-1 text-muted fw-bold">{{ calories }} kcal</p>
+    <small class="d-block">🥩 {{ proteins }}g | 🍞 {{ carbs }}g | 🧈 {{ fats }}g</small>
+  </div>
+  <button class="btn btn-light rounded-circle shadow-sm"
+          (click)="toggleFavorite(); $event.stopPropagation()">
+    <i class="bi" [class.bi-heart-fill]="isFavorite" [class.bi-heart]="!isFavorite"
+       [class.text-danger]="isFavorite"></i>
+  </button>
+</div>

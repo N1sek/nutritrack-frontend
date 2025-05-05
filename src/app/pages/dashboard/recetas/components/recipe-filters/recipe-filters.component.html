@@ -1,0 +1,131 @@
+<!-- BOTÓN FILTROS (MOVIL) -->
+<div class="d-md-none mb-3">
+  <button class="btn btn-primary w-100" data-bs-toggle="offcanvas" data-bs-target="#filtrosOffcanvas">
+    <i class="bi bi-funnel"></i> Filtros
+  </button>
+</div>
+
+<!-- ==FILTROS EN DESKTOP== -->
+<div class="d-none d-md-flex flex-wrap gap-3 mb-4">
+
+  <!-- Filtro de Calorias -->
+  <div class="dropdown">
+    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      Calorías
+    </button>
+    <div class="dropdown-menu p-3 w-100" style="min-width: 300px;">
+      <label class="form-label">Rango de Calorías (kcal)</label>
+      <div class="input-group">
+        <input type="number" class="form-control" placeholder="Mín" [(ngModel)]="minCalories"
+               (ngModelChange)="applyFilters()">
+        <span class="input-group-text">-</span>
+        <input type="number" class="form-control" placeholder="Máx" [(ngModel)]="maxCalories"
+               (ngModelChange)="applyFilters()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtro de Alergenos -->
+  <div class="dropdown">
+    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      Alergenos
+    </button>
+    <div class="dropdown-menu p-3" style="min-width: 400px;">
+      <label class="form-label">Selecciona alérgenos</label>
+      <div class="row">
+        @for (allergen of allergens; track allergen) {
+          <div class="col-6">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" [id]="'allergen' + allergen.name"
+                     (change)="toggleAllergen(allergen.name)">
+              <label class="form-check-label" [for]="'allergen' + allergen.name">
+                {{ allergen.icon }} {{ allergen.name }}
+              </label>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtro de Tipo de Comida -->
+  <select class="form-select w-auto" [(ngModel)]="selectedMealType" (ngModelChange)="applyFilters()">
+    <option value="">Tipo de comida</option>
+    @for (mealType of mealTypes; track mealType) {
+      <option [value]="mealType">{{ mealType }}</option>
+    }
+  </select>
+
+  <!-- Filtro de Etiquetas -->
+  <input type="text" class="form-control w-auto" placeholder="Ej: #vegan, #lowfat..." [(ngModel)]="selectedTags"
+         (ngModelChange)="applyFilters()">
+
+  <!-- Filtro de Favoritos -->
+  <button class="btn"
+          [ngClass]="{'btn-danger': showFavorites, 'btn-outline-danger': !showFavorites}"
+          (click)="toggleFavorites()">
+    <i class="bi" [class.bi-heart-fill]="showFavorites" [class.bi-heart]="!showFavorites"></i>
+    Favoritos
+  </button>
+
+  <input type="text" class="form-control w-25" placeholder="Buscar receta..." [(ngModel)]="searchQuery"
+         (ngModelChange)="applyFilters()">
+</div>
+
+
+
+<!-- ==FILTROS EN OFFCANVAS (MOVIL)== -->
+<div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="filtrosOffcanvas">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">Filtros</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <input type="text" class="form-control mb-3" placeholder="Buscar receta..." [(ngModel)]="searchQuery">
+
+    <label class="form-label">Calorías (kcal)</label>
+    <div class="input-group mb-3">
+      <input type="number" class="form-control" placeholder="Mín" [(ngModel)]="minCalories">
+      <span class="input-group-text">-</span>
+      <input type="number" class="form-control" placeholder="Máx" [(ngModel)]="maxCalories">
+    </div>
+
+    <label class="form-label">Tipo de comida</label>
+    <select class="form-select mb-3" [(ngModel)]="selectedMealType">
+      <option value="">Seleccionar</option>
+      @for (mealType of mealTypes; track mealType) {
+        <option [value]="mealType">{{ mealType }}</option>
+      }
+    </select>
+
+    <!-- Filtro de Etiquetas -->
+    <label class="form-label">Etiquetas</label>
+    <input type="text" class="form-control mb-3" placeholder="Ej: #vegan, #lowfat..." [(ngModel)]="selectedTags">
+
+    <!-- Filtro de Alergenos en Móviles -->
+    <label class="form-label">Alergenos</label>
+    <div class="row mb-3">
+      @for (allergen of allergens; track allergen) {
+        <div class="col-6">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" [id]="'mobile-allergen' + allergen.name"
+                   (change)="toggleAllergen(allergen.name)">
+            <label class="form-check-label" [for]="'mobile-allergen' + allergen.name">
+              {{ allergen.icon }} {{ allergen.name }}
+            </label>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Filtro de Favoritos -->
+    <button class="btn w-100 mb-3"
+            [ngClass]="{'btn-danger': showFavorites, 'btn-outline-danger': !showFavorites}"
+            (click)="toggleFavorites()">
+      <i class="bi" [class.bi-heart-fill]="showFavorites" [class.bi-heart]="!showFavorites"></i>
+      Mostrar Solo Favoritos
+    </button>
+
+    <button class="btn btn-primary mt-3 w-100" (click)="applyFiltersOnMobile()">Aplicar</button>
+  </div>
+</div>
