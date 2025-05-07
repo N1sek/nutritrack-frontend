@@ -1,14 +1,17 @@
-import {Component, Input} from '@angular/core';
-import {NgForOf} from '@angular/common';
+import { Component, Input } from '@angular/core';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'register-stepper',
-  imports: [
-  ],
+  standalone: true,
   templateUrl: './stepper.component.html',
-  styleUrl: './stepper.component.scss'
+  styleUrl: './stepper.component.scss',
+  imports: [
+    NgClass
+  ]
 })
 export class StepperComponent {
+  @Input() currentStep = 1;
 
-
+  steps = [1, 2, 3, 4]; // define los 4 pasos del wizard
 }
