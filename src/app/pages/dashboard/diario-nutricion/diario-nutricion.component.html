@@ -4,14 +4,14 @@
 <app-search-food-modal (foodSelected)="handleFoodSelected($event)"></app-search-food-modal>
 
 <main class="container-xxl py-5">
-  <h3 class="mb-4 text-center">🍽️ My Meals</h3>
+  <h3 class="mb-4 text-center">🍽️ Mis Comidas</h3>
 
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <app-box>
         <h5 class="mb-3 text-center">📅 Today <i class="bi bi-chevron-down"></i></h5>
 
-        @for (meal of ['Breakfast', 'Lunch', 'Snack', 'Dinner']; track meal) {
+        @for (meal of ['Desayuno', 'Comida', 'Almuerzo', 'Cena']; track meal) {
           <div class="mb-4">
             <div class="bg-primary text-white p-2 rounded-3">
               <h5 class="mb-0">{{ meal }}</h5>
@@ -37,7 +37,7 @@
         }
 
         <div class="p-3 mt-3 bg-light rounded-3 text-center">
-          <h5 class="mb-2">📊 Total Nutrients</h5>
+          <h5 class="mb-2">📊 Total Nutrientes</h5>
           <p class="mb-0">🔥 {{ totalNutrients.calories }} kcal | 🥩 {{ totalNutrients.protein }}g | 🍞 {{ totalNutrients.carbs }}g | 🧈 {{ totalNutrients.fat }}g</p>
         </div>
       </app-box>
