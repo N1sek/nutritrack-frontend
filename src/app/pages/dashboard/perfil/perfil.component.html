@@ -19,7 +19,7 @@
 
           <div class="text-center mb-3">
             @if (user) {
-              <img [src]="user.imageUrl || 'assets/img/default-avatar.png'" class="rounded-circle" style="width: 120px; height: 120px;">
+              <img [src]="user.imageUrl || 'https://img.cryptorank.io/coins/arab_cat1706520810607.png'" class="rounded-circle" style="width: 120px; height: 120px;">
             }
             <input type="file" class="form-control mt-2" (change)="uploadImage($event)">
           </div>
