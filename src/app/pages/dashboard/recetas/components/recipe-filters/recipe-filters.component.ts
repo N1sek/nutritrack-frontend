@@ -24,7 +24,18 @@ export class RecipeFiltersComponent {
 
   isMobile: boolean = window.innerWidth < 768;
 
-  mealTypes = ['Desayuno', 'Almuerzo', 'Cena', 'Snack'];
+  mealTypes = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
+
+  translateMealType(type: string): string {
+    switch (type) {
+      case 'BREAKFAST': return 'Desayuno';
+      case 'LUNCH': return 'Comida';
+      case 'DINNER': return 'Cena';
+      case 'SNACK': return 'Snack';
+      default: return type;
+    }
+  }
+
   allergens = [
     { name: 'Gluten', icon: '🍞' },
     { name: 'Lactosa', icon: '🥛' },

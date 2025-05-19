@@ -37,4 +37,8 @@ export class FoodService {
   createFood(food: FoodRequest): Observable<any> {
     return this.http.post<any>(this.baseUrl, food);
   }
+
+  searchAllFoods(query: string): Observable<any[]>{
+    return this.http.get<any[]>(`${this.baseUrl}/search?query=${query}`);
+  }
 }

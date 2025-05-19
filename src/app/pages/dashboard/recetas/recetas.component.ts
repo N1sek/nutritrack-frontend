@@ -1,8 +1,10 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, inject, ViewChild } from '@angular/core';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { RecipeCardComponent } from './components/recipe-card/recipe-card.component';
 import { RecipeFiltersComponent } from './components/recipe-filters/recipe-filters.component';
 import { RecipeListComponent } from './components/recipe-list/recipe-list.component';
+import { CreateRecipeModalComponent } from '../../../shared/components/create-recipe-modal/create-recipe-modal.component';
+import { RecipeService } from '../../../core/recipe.service';
 
 @Component({
   selector: 'app-recetas',
@@ -11,104 +13,76 @@ import { RecipeListComponent } from './components/recipe-list/recipe-list.compon
     NavbarComponent,
     RecipeCardComponent,
     RecipeFiltersComponent,
-    RecipeListComponent
+    RecipeListComponent,
+    CreateRecipeModalComponent
   ],
   templateUrl: './recetas.component.html',
   styleUrls: ['./recetas.component.scss']
 })
 export class RecetasComponent {
-  isGridView: boolean = window.innerWidth >= 768; // Cambiar modo vista segun pantalla
-  recipes = [
-    {
-      name: 'Huevos a la flamenca',
-      calories: 250,
-      proteins: 15,
-      carbs: 20,
-      fats: 10,
-      imageUrl: 'assets/img/plato2.png',
-      tags: ['#vegan', '#lowfat'],
-      mealType: 'Cena',
-      isFavorite: false
-    },
-    {
-      name: 'Hamburguesa de ternera',
-      calories: 400,
-      proteins: 30,
-      carbs: 35,
-      fats: 18,
-      imageUrl: 'assets/img/plato3.png',
-      tags: ['#highprotein'],
-      mealType: 'Almuerzo',
-      isFavorite: true
-    },
-    {
-      name: 'Tarta de queso',
-      calories: 800,
-      proteins: 10,
-      carbs: 50,
-      fats: 45,
-      imageUrl: 'assets/img/plato1.png',
-      tags: ['#tagüenisimo'],
-      mealType: 'Cena',
-      isFavorite: false
+  @ViewChild(CreateRecipeModalComponent) createModal!: CreateRecipeModalComponent;
+  private recipeService = inject(RecipeService);
+
+  isGridView: boolean = window.innerWidth >= 768;
+  recipes: any[] = [];
+  filteredRecipes: any[] = [];
+
+  currentPage = 0;
+  totalPages = 0;
+  pageSize = 20;
+
+  get pageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+
+  ngOnInit() {
+    this.loadRecipes();
+  }
+
+  loadRecipes() {
+    this.recipeService.getAllRecipes(this.currentPage, this.pageSize).subscribe({
+      next: (res) => {
+        this.recipes = res.content;
+        this.totalPages = res.totalPages;
+        this.filteredRecipes = [...this.recipes];
+      },
+      error: (err) => console.error('Error al cargar recetas:', err)
+    });
+  }
+
+  goToPage(page: number) {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.loadRecipes();
     }
-  ];
-
-  filteredRecipes = [...this.recipes]; // Inicialmente muestra todas las recetas
-
-  constructor() {
-    this.updateViewMode();
-  }
-
-  @HostListener('window:resize', ['$event'])
-  onResize() {
-    this.updateViewMode();
-  }
-
-  updateViewMode() {
-    this.isGridView = window.innerWidth >= 768;
   }
 
   toggleView() {
     this.isGridView = !this.isGridView;
   }
 
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.isGridView = window.innerWidth >= 768;
+  }
+
   applyFilters(filters: any) {
-    console.log("📌 Aplicando filtros: ", filters);
-
     this.filteredRecipes = this.recipes.filter(recipe => {
-      // Filtro de busqueda
-      if (filters.searchQuery && !recipe.name.toLowerCase().includes(filters.searchQuery.toLowerCase())) {
-        return false;
-      }
-
-      // Filtro de calorias
-      if (filters.minCalories && recipe.calories < filters.minCalories) {
-        return false;
-      }
-      if (filters.maxCalories && recipe.calories > filters.maxCalories) {
-        return false;
-      }
-
-      // Filtro de tipo de comida
-      if (filters.selectedMealType && recipe.mealType !== filters.selectedMealType) {
-        return false;
-      }
-
-      // Filtro de alergenos
+      if (filters.searchQuery && !recipe.name.toLowerCase().includes(filters.searchQuery.toLowerCase())) return false;
+      if (filters.minCalories && recipe.calories < filters.minCalories) return false;
+      if (filters.maxCalories && recipe.calories > filters.maxCalories) return false;
+      if (filters.selectedMealType && recipe.mealType !== filters.selectedMealType) return false;
       if (filters.selectedAlergens.length > 0) {
         for (let allergen of filters.selectedAlergens) {
-          if (recipe.tags.includes(allergen)) {
-            return false; // Excluir receta si contiene alergeno
-          }
+          if ((recipe.tags || []).includes(allergen)) return false;
         }
       }
-
-      // Filtro de favoritos
-      return !(filters.showFavorites && !recipe.isFavorite);
-
-
+      return !(filters.showFavorites && !recipe.isFavorited);
     });
+  }
 
+  onRecipeCreated() {
+    this.loadRecipes();
   }
 }

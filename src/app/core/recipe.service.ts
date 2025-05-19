@@ -29,6 +29,15 @@ export class RecipeService {
 
   constructor(private http: HttpClient) {}
 
+  createRecipe(recipeData: any): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/recipes`, recipeData);
+  }
+
+  getAllRecipes(page = 0, size = 20): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/recipes?page=${page}&size=${size}`);
+  }
+
+
   /**
    * Busca recetas por nombre
    */

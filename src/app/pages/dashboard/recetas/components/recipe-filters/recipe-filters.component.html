@@ -52,7 +52,7 @@
   <select class="form-select w-auto" [(ngModel)]="selectedMealType" (ngModelChange)="applyFilters()">
     <option value="">Tipo de comida</option>
     @for (mealType of mealTypes; track mealType) {
-      <option [value]="mealType">{{ mealType }}</option>
+      <option [value]="mealType">{{ translateMealType(mealType) }}</option>
     }
   </select>
 

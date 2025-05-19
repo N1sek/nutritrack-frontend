@@ -36,7 +36,7 @@ export class SearchFoodModalComponent {
     private recipeService: RecipeService
   ) {
     this.searchSubject.pipe(
-      debounceTime(400),
+      debounceTime(600),
       distinctUntilChanged()
     ).subscribe(query => {
       if (!query.trim()) {
@@ -85,11 +85,14 @@ export class SearchFoodModalComponent {
   fetchExternalResults(query: string) {
     this.loadingExternal = true;
     this.foodService.searchExternalFoods(query).subscribe(res => {
+      if (query !== this.query.trim()) return;
+
       this.externalResults = res;
       this.loadingExternal = false;
       this.mergeResults();
     });
   }
+
 
   mergeResults() {
     const merged = [...this.localResults];

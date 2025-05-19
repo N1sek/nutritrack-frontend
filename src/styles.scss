@@ -89,4 +89,16 @@ body{
 .vh-80{
   height: 80vh !important;
 }
+.placeholder {
+  display: inline-block;
+  background-color: #dee2e6;
+  border-radius: 0.25rem;
+  animation: placeholder-glow 2s infinite;
+}
+
+@keyframes placeholder-glow {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
 

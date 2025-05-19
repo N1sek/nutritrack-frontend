@@ -11,63 +11,81 @@
   <!-- Filtros -->
   <app-recipe-filters (filtersChanged)="applyFilters($event)"></app-recipe-filters>
 
-  <!-- MODO GRID -->
+  <!-- Vista Grid -->
   @if (isGridView) {
     <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
       <div class="col">
         <div class="card h-100 position-relative" style="min-height: 300px">
           <div class="position-absolute top-0 start-0 w-100 h-100"
-                    style="background: url('/assets/img/crear-receta.jpg') center/cover; opacity: 0.3; border-radius: inherit;"></div>
+               style="background: url('/assets/img/crear-receta.jpg') center/cover; opacity: 0.3; border-radius: inherit;"></div>
           <div class="position-absolute top-50 start-50 translate-middle">
-            <button class="btn btn-light btn-lg rounded-circle">
+            <button class="btn btn-light btn-lg rounded-circle" (click)="createModal.openModal()">
               <i class="bi bi-plus-lg fs-1 text-primary"></i>
             </button>
           </div>
         </div>
       </div>
 
-      @for (recipe of filteredRecipes; track recipe) {
+      @for (recipe of filteredRecipes; track recipe.id) {
         <app-recipe-card
           [name]="recipe.name"
           [calories]="recipe.calories"
-          [proteins]="recipe.proteins"
+          [proteins]="recipe.protein"
           [carbs]="recipe.carbs"
-          [fats]="recipe.fats"
-          [imageUrl]="recipe.imageUrl"
-          [tags]="recipe.tags"
+          [fats]="recipe.fat"
+          [imageUrl]="recipe.imageUrl || 'assets/img/no-image-food.png'"
+          [tags]="recipe.tags || []"
           [mealType]="recipe.mealType"
-          [isFavorite]="recipe.isFavorite">
+          [isFavorite]="recipe.isFavorited">
         </app-recipe-card>
       }
     </div>
   }
 
-  <!-- MODO LISTA -->
+  <!-- Vista Lista -->
   @if (!isGridView) {
     <div class="d-flex flex-column">
-
-      <!-- Agregar nueva receta en modo lista -->
       <div class="d-flex align-items-center border-bottom py-2">
-        <button class="btn btn-outline-primary w-100 d-flex justify-content-center align-items-center py-3">
+        <button class="btn btn-outline-primary w-100 d-flex justify-content-center align-items-center py-3" (click)="createModal.openModal()">
           <i class="bi bi-plus-lg me-2"></i> Crear nueva receta
         </button>
       </div>
 
-      @for (recipe of filteredRecipes; track recipe) {
+      @for (recipe of filteredRecipes; track recipe.id) {
         <app-recipe-list
           [name]="recipe.name"
           [calories]="recipe.calories"
-          [proteins]="recipe.proteins"
+          [proteins]="recipe.protein"
           [carbs]="recipe.carbs"
-          [fats]="recipe.fats"
-          [imageUrl]="recipe.imageUrl"
-          [tags]="recipe.tags"
+          [fats]="recipe.fat"
+          [imageUrl]="recipe.imageUrl || 'assets/img/no-image-food.png'"
+          [tags]="recipe.tags || []"
           [mealType]="recipe.mealType"
-          [isFavorite]="recipe.isFavorite">
+          [isFavorite]="recipe.isFavorited">
         </app-recipe-list>
       }
-
     </div>
   }
 
+  <!-- Paginación -->
+  <nav class="mt-4 d-flex justify-content-center">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 0">
+        <button class="page-link" (click)="goToPage(currentPage - 1)">Anterior</button>
+      </li>
+
+      @for (page of pageNumbers; track page) {
+        <li class="page-item" [class.active]="page === currentPage">
+          <button class="page-link" (click)="goToPage(page)">{{ page + 1 }}</button>
+        </li>
+      }
+
+      <li class="page-item" [class.disabled]="currentPage + 1 >= totalPages">
+        <button class="page-link" (click)="goToPage(currentPage + 1)">Siguiente</button>
+      </li>
+    </ul>
+  </nav>
+
+
+  <app-create-recipe-modal (recipeCreated)="onRecipeCreated()"></app-create-recipe-modal>
 </main>
