@@ -1,0 +1,270 @@
+<!-- src/app/shared/components/create-recipe-modal/create-recipe-modal.component.html -->
+<div class="modal fade" id="createRecipeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title">👨‍🍳 Crear nueva receta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body pt-3">
+
+        <!-- PASO 1: Información básica -->
+        @if (step === 1) {
+          <h6 class="mb-3">📝 Información básica</h6>
+
+          <div class="mb-3">
+            <label class="form-label">Nombre de la receta *</label>
+            <input type="text"
+                   class="form-control"
+                   [(ngModel)]="form.name"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control"
+                      rows="2"
+                      [(ngModel)]="form.description"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Instrucciones de preparación</label>
+            <textarea class="form-control"
+                      rows="4"
+                      [(ngModel)]="form.instructions"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">URL de la imagen</label>
+            <input type="text"
+                   class="form-control"
+                   [(ngModel)]="form.imageUrl">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Tipo de comida</label>
+            <select class="form-select" [(ngModel)]="form.mealType">
+              <option value="BREAKFAST">Desayuno</option>
+              <option value="LUNCH">Comida</option>
+              <option value="DINNER">Cena</option>
+              <option value="SNACK">Snack</option>
+            </select>
+          </div>
+
+          <div class="form-check form-switch mb-4">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="publicCheck"
+                   [(ngModel)]="form.isPublic">
+            <label class="form-check-label" for="publicCheck">Visible públicamente</label>
+          </div>
+
+          <div class="text-end">
+            <button class="btn btn-primary"
+                    (click)="goToStep(2)"
+                    [disabled]="!form.name.trim()">
+              Siguiente
+            </button>
+          </div>
+        }
+
+        <!-- PASO 2: Añadir ingredientes -->
+        @if (step === 2) {
+          <h6 class="mb-3">🍽️ Ingredientes</h6>
+
+          <!-- Buscador -->
+          <div class="mb-3">
+            <label class="form-label">Buscar alimento</label>
+            <input type="text"
+                   class="form-control"
+                   placeholder="Ej: Arroz, Pollo..."
+                   [(ngModel)]="searchQuery"
+                   (ngModelChange)="onSearchQueryChange()">
+          </div>
+
+          <!-- Skeleton inicial -->
+          @if (loadingExternal && mergedResults.length === 0) {
+            @for (_ of [1,2,3,4]; track _) {
+              <div class="list-group-item placeholder-glow mb-2 rounded-3">
+                <div class="d-flex align-items-center gap-3 w-100">
+                  <div class="placeholder rounded" style="width:50px;height:50px;"></div>
+                  <div class="flex-grow-1">
+                    <div class="placeholder col-8 rounded mb-1"></div>
+                    <div class="placeholder col-6 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            }
+          }
+
+          <!-- Resultados de búsqueda -->
+          @if (mergedResults.length > 0) {
+            <div class="list-group mb-2">
+              @for (food of mergedResults; track food.name + '|' + food.imageUrl) {
+                <div class="list-group-item d-flex align-items-center gap-3">
+                  <img [src]="food.imageUrl || 'assets/img/no-image-food.png'"
+                       (error)="food.imageUrl='assets/img/no-image-food.png'"
+                       class="rounded"
+                       style="width:50px;height:50px;object-fit:cover;"
+                       alt="Imagen">
+                  <div class="flex-grow-1">
+                    <strong>{{ food.name }}</strong>
+                    <div class="text-muted small">
+                      🔥 {{ food.calories || 0 }} kcal |
+                      🥩 {{ food.protein || 0 }} g |
+                      🍞 {{ food.carbs || 0 }} g |
+                      🧈 {{ food.fat || 0 }} g
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="input-group input-group-sm w-auto">
+                      <input type="number"
+                             class="form-control"
+                             min="1"
+                             step="1"
+                             [(ngModel)]="food.tempQuantity">
+                      <span class="input-group-text">g</span>
+                    </div>
+                    <button class="btn btn-outline-success btn-sm"
+                            (click)="addIngredient(food)">
+                      Añadir
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Spinner mientras carga más -->
+            @if (loadingExternal) {
+              <div class="text-center mb-2">
+                <div class="spinner-border spinner-border-sm text-primary"></div>
+                <small class="ms-2 text-muted">Cargando más…</small>
+              </div>
+            }
+
+            <!-- Botón Cargar más -->
+            @if (!loadingExternal && hasMoreExternal) {
+              <div class="text-center mb-4">
+                <button class="btn btn-outline-primary btn-sm"
+                        (click)="loadMoreExternalFoods()">
+                  Cargar más…
+                </button>
+              </div>
+            }
+          }
+
+          <!-- Sin resultados -->
+          @if (!loadingExternal && mergedResults.length === 0 && searchQuery.trim().length > 0) {
+            <div class="text-center text-muted">No se encontraron alimentos.</div>
+          }
+
+          <!-- Ingredientes añadidos -->
+          <h6 class="mb-2 mt-4">📋 Ingredientes añadidos</h6>
+          <ul class="list-group mb-3">
+            @for (ing of form.ingredients; track ing.food.id) {
+              <li class="list-group-item">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2">
+                    <img [src]="ing.food.imageUrl || 'assets/img/no-image-food.png'"
+                         class="rounded"
+                         style="width:40px;height:40px;object-fit:cover;"
+                         alt="Imagen">
+                    <div>
+                      <strong>{{ ing.food.name }}</strong>
+                      <div class="text-muted small">
+                        🔥 {{ (ing.customNutrition?.calories ?? ing.food.calories) || 0 }} kcal |
+                        🥩 {{ (ing.customNutrition?.protein  ?? ing.food.protein ) || 0 }} g |
+                        🍞 {{ (ing.customNutrition?.carbs    ?? ing.food.carbs   ) || 0 }} g |
+                        🧈 {{ (ing.customNutrition?.fat      ?? ing.food.fat    ) || 0 }} g
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="input-group input-group-sm w-auto">
+                      <input type="number"
+                             class="form-control"
+                             min="1"
+                             step="1"
+                             [ngModel]="ing.quantity"
+                             (ngModelChange)="updateIngredientQuantity(form.ingredients.indexOf(ing), $event)">
+                      <span class="input-group-text">g</span>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm"
+                            (click)="startEditNutrition(form.ingredients.indexOf(ing))">
+                      Editar
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm"
+                            (click)="removeIngredient(form.ingredients.indexOf(ing))">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                </div>
+
+                @if (editingIndex === form.ingredients.indexOf(ing)) {
+                  <div class="mt-3 bg-light p-3 rounded">
+                    <div class="row g-2">
+                      <div class="col-6 col-md-3">
+                        <label class="form-label">Calorías</label>
+                        <input type="number"
+                               class="form-control form-control-sm"
+                               [(ngModel)]="customNutrition.calories">
+                      </div>
+                      <div class="col-6 col-md-3">
+                        <label class="form-label">Proteínas</label>
+                        <input type="number"
+                               class="form-control form-control-sm"
+                               [(ngModel)]="customNutrition.protein">
+                      </div>
+                      <div class="col-6 col-md-3">
+                        <label class="form-label">Carbohidratos</label>
+                        <input type="number"
+                               class="form-control form-control-sm"
+                               [(ngModel)]="customNutrition.carbs">
+                      </div>
+                      <div class="col-6 col-md-3">
+                        <label class="form-label">Grasas</label>
+                        <input type="number"
+                               class="form-control form-control-sm"
+                               [(ngModel)]="customNutrition.fat">
+                      </div>
+                    </div>
+                    <div class="text-end mt-3">
+                      <button class="btn btn-secondary btn-sm me-2"
+                              (click)="cancelEditNutrition()">
+                        Cancelar
+                      </button>
+                      <button class="btn btn-success btn-sm"
+                              (click)="confirmEditNutrition()">
+                        Guardar
+                      </button>
+                    </div>
+                  </div>
+                }
+              </li>
+            }
+          </ul>
+
+          <!-- Totales del día -->
+          <div class="bg-light p-3 rounded border mb-3 text-center">
+            <h6 class="mb-2">⚖️ Totales estimados</h6>
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+              <span class="badge bg-primary-subtle text-dark border">🔥 {{ total.calories }} kcal</span>
+              <span class="badge bg-success-subtle text-dark border">🥩 {{ total.protein  }} g</span>
+              <span class="badge bg-warning-subtle text-dark border">🍞 {{ total.carbs    }} g</span>
+              <span class="badge bg-danger-subtle text-dark border">🧈 {{ total.fat      }} g</span>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-secondary" (click)="goToStep(1)">Volver</button>
+            <button class="btn btn-success"
+                    (click)="submitRecipe()"
+                    [disabled]="form.ingredients.length === 0">
+              Guardar Receta
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

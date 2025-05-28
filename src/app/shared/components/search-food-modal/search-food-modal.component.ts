@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { debounceTime, Subject, distinctUntilChanged } from 'rxjs';
 import { FoodService } from '../../../core/food.service';
 import { RecipeService } from '../../../core/recipe.service';
@@ -14,9 +14,11 @@ declare var bootstrap: any;
   imports: [CommonModule, FormsModule]
 })
 export class SearchFoodModalComponent {
-  query: string = '';
-  quantity: number = 100;
-  mealType: string = '';
+  @Output() itemSelected = new EventEmitter<any>();
+
+  query = '';
+  quantity = 100;
+  mealType = '';
   mode: 'food' | 'recipe' = 'food';
 
   localResults: any[] = [];
@@ -24,44 +26,48 @@ export class SearchFoodModalComponent {
   mergedResults: any[] = [];
   recipeResults: any[] = [];
 
-  loadingExternal: boolean = false;
+  externalPage = 1;
+  externalSize = 10;
+  hasMoreExternal = true;
 
-  @Output() itemSelected = new EventEmitter<any>();
-
-
+  loadingExternal = false;
   private searchSubject = new Subject<string>();
+  private activeQuery = '';
 
-  constructor(
-    private foodService: FoodService,
-    private recipeService: RecipeService
-  ) {
+  private foodService = inject(FoodService);
+  private recipeService = inject(RecipeService);
+
+  constructor() {
     this.searchSubject.pipe(
-      debounceTime(600),
+      debounceTime(500),
       distinctUntilChanged()
-    ).subscribe(query => {
-      if (!query.trim()) {
+    ).subscribe(q => {
+      const trimmed = q.trim();
+      if (!trimmed) {
         this.resetResults();
         return;
       }
 
+      this.activeQuery = trimmed;
+      this.externalPage = 1;
+      this.hasMoreExternal = true;
+      this.loadingExternal = true;
+
       if (this.mode === 'food') {
-        this.fetchLocalResults(query);
-        this.fetchExternalResults(query);
+        this.fetchLocalResults(trimmed);
+        this.fetchExternalResults(trimmed);
       } else {
-        this.fetchRecipes(query);
+        this.fetchRecipes(trimmed);
       }
     });
   }
 
   openModal(mealType: string) {
-    this.query = '';
-    this.quantity = 100;
-    this.mealType = mealType;
     this.mode = 'food';
+    this.mealType = mealType;
+    this.query = '';
     this.resetResults();
-
-    const modalInstance = new bootstrap.Modal(document.getElementById('searchFoodModal')!);
-    modalInstance.show();
+    new bootstrap.Modal(document.getElementById('searchFoodModal')!).show();
   }
 
   onSearchChange() {
@@ -73,38 +79,66 @@ export class SearchFoodModalComponent {
     this.externalResults = [];
     this.mergedResults = [];
     this.recipeResults = [];
+    this.loadingExternal = false;
   }
 
-  fetchLocalResults(query: string) {
+  private fetchLocalResults(query: string) {
     this.foodService.searchLocalFoods(query).subscribe(res => {
+      if (query !== this.activeQuery) return;
       this.localResults = res;
       this.mergeResults();
     });
   }
 
-  fetchExternalResults(query: string) {
-    this.loadingExternal = true;
-    this.foodService.searchExternalFoods(query).subscribe(res => {
-      if (query !== this.query.trim()) return;
-
-      this.externalResults = res;
-      this.loadingExternal = false;
-      this.mergeResults();
-    });
+  private fetchExternalResults(query: string) {
+    this.foodService.searchExternalFoods(query, this.externalPage, this.externalSize)
+      .subscribe(res => {
+        if (query !== this.activeQuery) return;
+        if (this.externalPage === 1) {
+          this.externalResults = res;
+        } else {
+          this.externalResults = [...this.externalResults, ...res];
+        }
+        if (res.length < this.externalSize) {
+          this.hasMoreExternal = false;
+        }
+        this.loadingExternal = false;
+        this.mergeResults();
+      });
   }
 
+  loadMoreExternalFoods() {
+    if (this.loadingExternal || !this.hasMoreExternal) return;
+    this.externalPage++;
+    this.loadingExternal = true;
+    this.fetchExternalResults(this.activeQuery);
+  }
 
-  mergeResults() {
-    const merged = [...this.localResults];
-    for (const ext of this.externalResults) {
-      if (!merged.some(loc => loc.name === ext.name && loc.imageUrl === ext.imageUrl)) {
-        merged.push(ext);
+  private mergeResults() {
+    const seen = new Set<string>();
+    const all: any[] = [];
+
+    // locales primero
+    for (const f of this.localResults) {
+      const key = f.name.toLowerCase() + '|' + (f.imageUrl || '');
+      if (!seen.has(key)) {
+        seen.add(key);
+        all.push({ ...f, tempQuantity: 100 });
       }
     }
-    this.mergedResults = merged;
+    // luego externos
+    for (const f of this.externalResults) {
+      const key = f.name.toLowerCase() + '|' + (f.imageUrl || '');
+      if (!seen.has(key)) {
+        seen.add(key);
+        all.push({ ...f, tempQuantity: 100 });
+      }
+    }
+
+    this.mergedResults = all;
   }
 
-  fetchRecipes(query: string) {
+  private fetchRecipes(query: string) {
     this.recipeService.searchRecipes(query).subscribe(res => {
       this.recipeResults = res;
     });
@@ -113,29 +147,38 @@ export class SearchFoodModalComponent {
   selectItem(item: any) {
     const modal = bootstrap.Modal.getInstance(document.getElementById('searchFoodModal')!);
 
-    if (!item.id) {
-      // alimento importado
-      this.foodService.importFood(item).subscribe({
-        next: (imported) => {
-          this.itemSelected.emit({
-            foodId: imported.id,
-            quantity: this.quantity,
-            mealType: this.mealType
-          });
-          modal?.hide();
-        },
-        error: (err) => console.error('Error al importar alimento:', err)
-      });
+    if (this.mode === 'food') {
+      // si no tiene id (solo externo), importarlo primero
+      if (!item.id) {
+        this.foodService.importFood(item).subscribe({
+          next: imported => {
+            this.itemSelected.emit({
+              foodId: imported.id,
+              quantity: this.quantity,
+              mealType: this.mealType
+            });
+            modal?.hide();
+          },
+          error: err => console.error('Error al importar alimento:', err)
+        });
+      } else {
+        this.itemSelected.emit({
+          foodId: item.id,
+          quantity: this.quantity,
+          mealType: this.mealType
+        });
+        modal?.hide();
+      }
+
     } else {
-      // alimento o receta local
-      const payload = item.calories
-        ? { foodId: item.id, quantity: this.quantity, mealType: this.mealType }
-        : { recipeId: item.id, quantity: this.quantity, mealType: this.mealType };
-
-      this.itemSelected.emit(payload);
+      // modo receta
+      this.itemSelected.emit({
+        recipeId: item.id,
+        quantity: this.quantity,
+        mealType: this.mealType
+      });
       modal?.hide();
-      (document.activeElement as HTMLElement)?.blur();
-
     }
   }
+
 }

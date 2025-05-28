@@ -1,7 +1,21 @@
+// src/app/core/food.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../environments/environment';
 import { Observable } from 'rxjs';
+
+export interface FoodResponse {
+  id: number;
+  name: string;
+  imageUrl?: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  sugar?: number;
+  salt?: number;
+  saturatedFat?: number;
+}
 
 export interface FoodRequest {
   name: string;
@@ -22,23 +36,38 @@ export class FoodService {
 
   constructor(private http: HttpClient) {}
 
-  searchLocalFoods(query: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/search/local?query=${query}`);
+  /** Busca solo en tu base de datos local */
+  searchLocalFoods(query: string): Observable<FoodResponse[]> {
+    const params = new HttpParams().set('query', query);
+    return this.http.get<FoodResponse[]>(`${this.baseUrl}/search/local`, { params });
   }
 
-  searchExternalFoods(query: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/search/external?query=${query}`);
+  /** Busca en la API externa con paginación */
+  searchExternalFoods(
+    query: string,
+    page: number,
+    size: number = 10
+  ): Observable<FoodResponse[]> {
+    const params = new HttpParams()
+      .set('query', query)
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<FoodResponse[]>(`${this.baseUrl}/search/external`, { params });
   }
 
-  importFood(food: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/import`, food);
+  /** Importa un alimento externo a tu base de datos local */
+  importFood(food: any): Observable<FoodResponse> {
+    return this.http.post<FoodResponse>(`${this.baseUrl}/import`, food);
   }
 
-  createFood(food: FoodRequest): Observable<any> {
-    return this.http.post<any>(this.baseUrl, food);
+  /** Crea un nuevo alimento en tu base de datos local */
+  createFood(food: FoodRequest): Observable<FoodResponse> {
+    return this.http.post<FoodResponse>(this.baseUrl, food);
   }
 
-  searchAllFoods(query: string): Observable<any[]>{
-    return this.http.get<any[]>(`${this.baseUrl}/search?query=${query}`);
+  /** Busca combinando local + externa (sin paginar externals) */
+  searchAllFoods(query: string): Observable<FoodResponse[]> {
+    const params = new HttpParams().set('query', query);
+    return this.http.get<FoodResponse[]>(`${this.baseUrl}/search`, { params });
   }
 }
