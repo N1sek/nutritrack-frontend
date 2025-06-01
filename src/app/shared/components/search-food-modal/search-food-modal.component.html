@@ -36,7 +36,7 @@
           </div>
         </div>
 
-        <!-- Campo de búsqueda -->
+        <!-- Campo de busqueda -->
         <input
           type="text"
           class="form-control mb-3"
@@ -44,7 +44,7 @@
           [(ngModel)]="query"
           (ngModelChange)="onSearchChange()">
 
-        <!-- Spinner “Cargando más” si ya hay resultados locales mientras llegan los externos -->
+        <!-- Spinner -->
         @if (mode === 'food' && loadingExternal && mergedResults.length > 0) {
           <div class="text-center mb-3">
             <div class="spinner-border text-primary" role="status"></div>
@@ -80,7 +80,7 @@
             </div>
           }
 
-          <!-- Botón “Cargar más” solo si exía al menos un lote completo de externos -->
+          <!-- Cargar mas -->
           @if (mode === 'food'
           && !loadingExternal
           && hasMoreExternal
@@ -95,7 +95,7 @@
           }
         </div>
 
-        <!-- Mensajes de “no resultados” -->
+        <!-- Mensajes -->
         @if (mode === 'food'
         && !loadingExternal
         && mergedResults.length === 0

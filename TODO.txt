@@ -1,0 +1,6 @@
+- Al buscar alimentos, si se busca una palabra y luego se borra el input para buscar otra, eliminar de la lista actual los alimentos
+y mostrar un skeleton en su lugar
+
+- Agregar dropwdown gramos o ml en cantidades
+
+- Spinner en el diario de comidas, al buscar alimento

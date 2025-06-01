@@ -28,6 +28,7 @@
 
       @for (recipe of filteredRecipes; track recipe.id) {
         <app-recipe-card
+          [id]="recipe.id"
           [name]="recipe.name"
           [calories]="recipe.calories"
           [proteins]="recipe.protein"
@@ -36,7 +37,7 @@
           [imageUrl]="recipe.imageUrl || 'assets/img/no-image-food.png'"
           [tags]="recipe.tags || []"
           [mealType]="recipe.mealType"
-          [isFavorite]="recipe.isFavorited">
+          [isFavorite]="recipe.favorited">
         </app-recipe-card>
       }
     </div>
@@ -61,7 +62,7 @@
           [imageUrl]="recipe.imageUrl || 'assets/img/no-image-food.png'"
           [tags]="recipe.tags || []"
           [mealType]="recipe.mealType"
-          [isFavorite]="recipe.isFavorited">
+          [isFavorite]="recipe.favorited">
         </app-recipe-list>
       }
     </div>

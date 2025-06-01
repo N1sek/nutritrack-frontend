@@ -78,7 +78,7 @@ export class RecetasComponent {
           if ((recipe.tags || []).includes(allergen)) return false;
         }
       }
-      return !(filters.showFavorites && !recipe.isFavorited);
+      return !(filters.showFavorites && !recipe.favorited);
     });
   }
 
