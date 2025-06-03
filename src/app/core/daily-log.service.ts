@@ -5,15 +5,14 @@ import { environment } from '../environments/environment';
 import { Observable } from 'rxjs';
 
 export interface DailyLog {
-  date: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
+  date: string;          // e.g. "2025-06-03"
+  totalCalories: number; // aunque en tu DTO lo llamabas "totalCalories"
+  totalProtein: number;
+  totalCarbs: number;
+  totalFat: number;
   water: number;
   weight: number | null;
   fastingHours: number | null;
-  // Si tu DTO incluye más campos, agrégalos aquí
 }
 
 @Injectable({ providedIn: 'root' })
@@ -41,10 +40,8 @@ export class DailyLogService {
    * Obtener todos los logs entre “start” y “end” (inclusive).
    * Endpoint: GET /daily-log/range?start=yyyy-MM-dd&end=yyyy-MM-dd
    */
-  getLogsInRange(start: string, end: string): Observable<DailyLog[]> {
-    const params = new HttpParams()
-      .set('start', start)
-      .set('end', end);
-    return this.http.get<DailyLog[]>(`${environment.apiUrl}/daily-log/range`, { params });
+  getExistingLogsInRange(start: string, end: string): Observable<DailyLog[]> {
+    const params = new HttpParams().set('start', start).set('end', end);
+    return this.http.get<DailyLog[]>(`${environment.apiUrl}/daily-log/existing-range`, { params });
   }
 }

@@ -1,0 +1,103 @@
+<app-navbar></app-navbar>
+
+<main class="container-xxl py-5">
+  <h3 class="mb-4">📊 Informes de Nutrición</h3>
+
+  <!-- 🔍 Filtros -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title mb-3">📅 Filtros</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Desde</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="startDate"
+            (change)="onFiltersChange()"
+            [max]="today"
+          >
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Hasta</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="endDate"
+            (change)="onFiltersChange()"
+            [max]="today"
+          >
+        </div>
+      </div>
+
+      <div *ngIf="rangeTooLarge" class="alert alert-warning mt-3">
+        El rango seleccionado no puede exceder {{ maxRangeDays }} dias. Por favor, selecciona un rango valido.
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4"
+       [hidden]="rangeTooLarge || records.length === 0">
+    <div class="col-md-6">
+      <app-box class="h-100">
+        <h5 class="text-center mb-3">🔥 Calorie Consumption</h5>
+        <canvas id="caloriesChart"></canvas>
+      </app-box>
+    </div>
+
+    <div class="col-md-6">
+      <app-box class="h-100">
+        <h5 class="text-center mb-3">🍽️ Macronutrients</h5>
+        <canvas id="macrosChart"></canvas>
+      </app-box>
+    </div>
+  </div>
+
+  <div *ngIf="!rangeTooLarge && records.length === 0"
+       class="text-center text-muted mt-4">
+    No hay datos disponibles para el rango seleccionado.
+  </div>
+
+  <!-- 📋 Tabla de Datos Detallados -->
+  <div class="card mt-4 shadow-sm"
+       [hidden]="rangeTooLarge || records.length === 0">
+    <div class="card-body">
+      <h5 class="card-title mb-3">📑 Resumen detallado</h5>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-primary">
+          <tr>
+            <th>Fecha</th>
+            <th>Calorias (kcal)</th>
+            <th>Proteinas (g)</th>
+            <th>Carbohidratos (g)</th>
+            <th>Grasa (g)</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let record of records; trackBy: trackByDate">
+            <td>{{ record.date }}</td>
+            <td>{{ record.totalCalories }}</td>
+            <td>{{ record.totalProtein }}</td>
+            <td>{{ record.totalCarbs }}</td>
+            <td>{{ record.totalFat }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📤 Botones de Exportacion -->
+  <div class="d-flex justify-content-end mt-3 gap-2">
+    <button class="btn btn-outline-secondary" (click)="exportReport('csv')">
+      <i class="bi bi-file-earmark-text"></i> Exportar CSV
+    </button>
+    <button class="btn btn-outline-primary" (click)="exportReport('excel')">
+      <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+    </button>
+    <button class="btn btn-outline-danger" (click)="exportReport('pdf')">
+      <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+    </button>
+  </div>
+</main>
