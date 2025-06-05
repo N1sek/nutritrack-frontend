@@ -4,3 +4,5 @@ y mostrar un skeleton en su lugar
 - Agregar dropwdown gramos o ml en cantidades
 
 - Spinner en el diario de comidas, al buscar alimento
+
+- Fix envio de edad perfil

@@ -58,7 +58,6 @@ export class RecipeFiltersComponent {
 
   // Aplica los filtros en escritorio automaticamente y en movil solo al presionar el boton de Aplicar
   applyFilters() {
-    console.log("📌 Aplicando filtros: ", this.getFilters());
 
     if (!this.isMobile) {
       this.filtersChanged.emit(this.getFilters());
@@ -67,7 +66,6 @@ export class RecipeFiltersComponent {
 
   // Aplicar cambios solo al pulsar el boton de Aplicar
   applyFiltersOnMobile() {
-    console.log("📌 Aplicando filtros (Móvil)");
     this.filtersChanged.emit(this.getFilters());
   }
 

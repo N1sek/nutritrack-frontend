@@ -16,10 +16,9 @@ import { RecipeService } from '../../../core/recipe.service';
     RecipeListComponent,
     CreateRecipeModalComponent
   ],
-  templateUrl: './recetas.component.html',
-  styleUrls: ['./recetas.component.scss']
+  templateUrl: './recipes.component.html'
 })
-export class RecetasComponent {
+export class RecipesComponent {
   @ViewChild(CreateRecipeModalComponent) createModal!: CreateRecipeModalComponent;
   private recipeService = inject(RecipeService);
 
@@ -55,6 +54,7 @@ export class RecetasComponent {
     if (page >= 0 && page < this.totalPages) {
       this.currentPage = page;
       this.loadRecipes();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 

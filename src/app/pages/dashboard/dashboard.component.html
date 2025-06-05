@@ -1,102 +1,204 @@
 <app-navbar></app-navbar>
 
 <main class="container-xxl py-5">
-  <h3 class="mb-4">Bienvenido, Denis👋</h3>
+  <!-- === Saludo dinámico === -->
+  <h3 class="mb-4">Hola {{ userName }} 👋</h3>
 
-  <!-- Tarjetas de resumen -->
+  <!-- === Progreso Calórico Diario === -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">🔥 Calorías diarias</h5>
+          <div class="d-flex justify-content-between mb-1">
+            <small>Consumido: {{ caloriesConsumed }} kcal</small>
+            <small>Objetivo: {{ calorieGoal }} kcal</small>
+          </div>
+          <div class="progress" style="height: 1.5rem;">
+            <div
+              class="progress-bar bg-primary"
+              role="progressbar"
+              aria-valuemin="0"
+              [attr.aria-valuenow]="caloriesConsumed"
+              [attr.aria-valuemax]="calorieGoal"
+              [ngStyle]="{
+                'width.%': calorieGoal > 0 ? (caloriesConsumed / calorieGoal) * 100 : 0
+              }"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Macros en un vistazo === -->
+  <div class="row mb-4 gx-3 gy-3">
+    <!-- Proteínas -->
+    <div class="col-sm-12 col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted">🥩 Proteínas</h6>
+          <div class="d-flex justify-content-between mb-1">
+            <small>{{ proteinConsumed }}g consumidas</small>
+            <small>Objetivo: {{ proteinGoal }}g</small>
+          </div>
+          <div class="progress" style="height: 1rem;">
+            <div
+              class="progress-bar bg-success"
+              role="progressbar"
+              aria-valuemin="0"
+              [attr.aria-valuenow]="proteinConsumed"
+              [attr.aria-valuemax]="proteinGoal"
+              [ngStyle]="{
+                'width.%': proteinGoal > 0 ? (proteinConsumed / proteinGoal) * 100 : 0
+              }"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carbohidratos -->
+    <div class="col-sm-12 col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted">🍞 Carbohidratos</h6>
+          <div class="d-flex justify-content-between mb-1">
+            <small>{{ carbsConsumed }}g consumidos</small>
+            <small>Objetivo: {{ carbsGoal }}g</small>
+          </div>
+          <div class="progress" style="height: 1rem;">
+            <div
+              class="progress-bar bg-warning"
+              role="progressbar"
+              aria-valuemin="0"
+              [attr.aria-valuenow]="carbsConsumed"
+              [attr.aria-valuemax]="carbsGoal"
+              [ngStyle]="{
+                'width.%': carbsGoal > 0 ? (carbsConsumed / carbsGoal) * 100 : 0
+              }"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grasas -->
+    <div class="col-sm-12 col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted">🧈 Grasas</h6>
+          <div class="d-flex justify-content-between mb-1">
+            <small>{{ fatConsumed }}g consumidas</small>
+            <small>Objetivo: {{ fatGoal }}g</small>
+          </div>
+          <div class="progress" style="height: 1rem;">
+            <div
+              class="progress-bar bg-danger"
+              role="progressbar"
+              aria-valuemin="0"
+              [attr.aria-valuenow]="fatConsumed"
+              [attr.aria-valuemax]="fatGoal"
+              [ngStyle]="{
+                'width.%': fatGoal > 0 ? (fatConsumed / fatGoal) * 100 : 0
+              }"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Tarjetas de información extra: Peso y Ayuno === -->
+  <div class="row mb-4 gx-3 gy-3">
+    <!-- Peso actual -->
+    <div class="col-sm-12 col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex align-items-center gap-3">
+          <span class="fs-2">⚖️</span>
+          <div>
+            <div class="small text-muted">Peso actual</div>
+            <div class="fw-bold">{{ userWeight || 0 }} kg</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Horas de ayuno -->
+    <div class="col-sm-12 col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex align-items-center gap-3">
+          <span class="fs-2">⏱️</span>
+          <div>
+            <div class="small text-muted">Horas de ayuno hoy</div>
+            <div class="fw-bold">{{ fastingHours || 0 }} h</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Últimas comidas === -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body p-3">
+          <h5 class="card-title mb-3">🍽️ Últimas comidas</h5>
+          <ul class="list-group list-group-flush">
+            @for (entry of recentEntries; track entry.id) {
+              <li class="list-group-item d-flex align-items-center">
+                <img
+                  [src]="entry.image || 'https://placehold.co/50x50'"
+                  class="rounded me-3"
+                  style="width: 50px; height: 50px; object-fit: cover;"
+                  [alt]="entry.name"
+                  (error)="entry.image = 'https://placehold.co/50x50'"
+                />
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between">
+                    <h6 class="mb-0">{{ entry.name }}</h6>
+                    <small class="text-muted">{{ entry.quantity }}</small>
+                  </div>
+                  <small class="text-muted">
+                    🔥 {{ entry.calories }} kcal |
+                    🥩 {{ entry.protein }}g |
+                    🍞 {{ entry.carbs }}g |
+                    🧈 {{ entry.fat }}g
+                  </small>
+                </div>
+              </li>
+            }
+            @if (recentEntries.length === 0) {
+              <li class="list-group-item text-center text-muted">
+                No hay comidas registradas hoy.
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Gráficas: lado a lado en md+ === -->
   <div class="row g-4">
-    <div class="col-md-3">
-      <div class="card shadow-sm p-3 text-center">
-        <h5 class="mb-1">🔥 Calorías consumidas</h5>
-        <p class="fs-4 fw-bold text-primary">{{ caloriasConsumidas }} kcal</p>
+    <div class="col-sm-12 col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body p-3">
+          <h5 class="card-title mb-3">📊 Calorías (últimos 7 días)</h5>
+          <canvas id="caloriasChart"></canvas>
+        </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card shadow-sm p-3 text-center">
-        <h5 class="mb-1">🥩 Proteínas</h5>
-        <p class="fs-4 fw-bold text-success">{{ proteinasConsumidas }}g</p>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card shadow-sm p-3 text-center">
-        <h5 class="mb-1">🍞 Carbohidratos</h5>
-        <p class="fs-4 fw-bold text-warning">{{ carbohidratosConsumidos }}g</p>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card shadow-sm p-3 text-center">
-        <h5 class="mb-1">🧈 Grasas</h5>
-        <p class="fs-4 fw-bold text-danger">{{ grasasConsumidas }}g</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Últimos alimentos añadidos -->
-  <div class="row g-4 mt-4">
-    <div class="col-md-6">
-      <!-- Lista de alimentos consumidos en el día -->
-      <div class="card shadow-sm p-3">
-        <h5 class="mb-3">🍽️ Ultimas comidas registradas</h5>
-        <ul class="list-group">
-          @for (comida of ultimasComidas; track comida.id) {
-            <li class="list-group-item d-flex align-items-center">
-              <!-- Imagen del alimento con fallback a placeholder -->
-              <img [src]="comida.imagen || 'https://placehold.co/80x80'"
-                   class="rounded me-3"
-                   style="width: 80px; height: 80px;"
-                   [alt]="comida.nombre"
-                   (error)="comida.imagen = 'https://placehold.co/80x80'">
-
-              <div class="flex-grow-1">
-                <h6 class="mb-1">{{ comida.nombre }}</h6>
-                <small class="text-muted">{{ comida.cantidad }}</small>
-                <p class="mb-0">🔥 {{ comida.calorias }} kcal | 🥩 {{ comida.proteinas }}g | 🍞 {{ comida.carbohidratos }}g | 🧈 {{ comida.grasas }}g</p>
-              </div>
-            </li>
+    <div class="col-sm-12 col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body p-3">
+          <h5 class="card-title mb-3">⚖️ Evolución del Peso</h5>
+          <canvas id="pesoChart"></canvas>
+          @if (!chartWeight?.data?.labels?.length) {
+            <div class="text-center text-muted mt-2">
+              No hay datos de peso para mostrar.
+            </div>
           }
-        </ul>
-      </div>
-
-    </div>
-
-    <!-- Balance Nutricional -->
-    <div class="col-md-6">
-      <div class="card shadow-sm p-3">
-        <h5 class="mb-3">🎯 Balance Nutricional</h5>
-        <ul class="list-group">
-          <li class="list-group-item d-flex justify-content-between">
-            🔥 Calorías restantes
-            <span class="badge bg-primary">{{ caloriasRestantes }} kcal</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between">
-            🥩 Proteínas restantes
-            <span class="badge bg-success">{{ proteinasRestantes }} g</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between">
-            🍞 Carbohidratos restantes
-            <span class="badge bg-warning">{{ carbohidratosRestantes }} g</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between">
-            🧈 Grasas restantes
-            <span class="badge bg-danger">{{ grasasRestantes }} g</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sección de gráficos (última en la página) -->
-  <div class="row g-4 mt-4">
-    <div class="col-md-6">
-      <div class="card shadow-sm p-3">
-        <h5 class="mb-3">📊 Consumo de Calorías</h5>
-        <canvas id="caloriasChart"></canvas>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card shadow-sm p-3">
-        <h5 class="mb-3">⚖️ Evolución del Peso</h5>
-        <canvas id="pesoChart"></canvas>
+        </div>
       </div>
     </div>
   </div>

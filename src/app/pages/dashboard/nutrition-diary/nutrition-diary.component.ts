@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { SearchFoodModalComponent } from '../../../shared/components/search-food-modal/search-food-modal.component';
 import {BoxComponent} from '../../../shared/components/box/box.component';
 import {NavbarComponent} from '../../../shared/components/navbar/navbar.component';
+import {DailyLogService} from '../../../core/daily-log.service';
 
 @Component({
   selector: 'app-nutrition-diary',
@@ -27,8 +28,7 @@ export class NutritionDiaryComponent implements OnInit {
   meals = ['BREAKFAST', 'LUNCH', 'SNACK', 'DINNER'];
   loading = false;
 
-  constructor(private http: HttpClient) {}
-
+  constructor(private http: HttpClient, private dailyLogService: DailyLogService) {}
   ngOnInit(): void {
     this.fetchDiary();
   }
@@ -53,10 +53,10 @@ export class NutritionDiaryComponent implements OnInit {
   handleItemSelected(entry: any) {
     const body = {
       date: this.currentDate,
-      entries: [entry]
+      entries: [entry]   // Solo envío la entrada nueva
     };
 
-    this.http.post(`${environment.apiUrl}/daily-log`, body).subscribe({
+    this.dailyLogService.saveOrUpdateDiary(body).subscribe({
       next: () => this.fetchDiary()
     });
   }
@@ -87,15 +87,22 @@ export class NutritionDiaryComponent implements OnInit {
   }
 
   get total() {
-    return this.entries.reduce((acc, e) => {
-      const item = e.food || e.recipe;
-      const q = e.quantity / 100;
-      acc.calories += (item.calories || 0) * q;
-      acc.protein += (item.protein || 0) * q;
-      acc.carbs += (item.carbs || 0) * q;
-      acc.fat += (item.fat || 0) * q;
-      return acc;
-    }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+    return this.entries.reduce(
+      (acc, e) => {
+        const item = e.food || e.recipe;
+        if (!item) {
+          // Si no hay food ni recipe, devolvemos el acumulador sin tocarlo
+          return acc;
+        }
+        const q = (e.quantity || 0) / 100;
+        acc.calories += (item.calories || 0) * q;
+        acc.protein  += (item.protein  || 0) * q;
+        acc.carbs    += (item.carbs    || 0) * q;
+        acc.fat      += (item.fat      || 0) * q;
+        return acc;
+      },
+      { calories: 0, protein: 0, carbs: 0, fat: 0 }
+    );
   }
 
   handleImageError(entry: any) {
