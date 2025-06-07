@@ -8,35 +8,74 @@
       <app-box>
         <h5 class="mb-3 text-center">📅 Hoy</h5>
 
+        <!-- HORAS DE AYUNO -->
+        <div class="mb-4 d-flex justify-content-center align-items-center">
+          <label class="form-label me-2">⏱️ Horas de ayuno:</label>
+          <input
+            type="number"
+            class="form-control w-auto"
+            [(ngModel)]="fastingHours"
+            (change)="saveFastingHours()"
+          />
+        </div>
+
         @for (meal of meals; track meal) {
           <div class="mb-4">
-            <div class="bg-primary text-white p-2 rounded-3 d-flex justify-content-between align-items-center">
+            <div
+              class="bg-primary text-white p-2 rounded-3 d-flex justify-content-between align-items-center"
+            >
               <h5 class="mb-0">{{ traducirMealType(meal) }}</h5>
-              <button class="btn btn-light btn-sm" (click)="openSearchModal(meal)">Añadir</button>
+              <button
+                class="btn btn-light btn-sm"
+                (click)="openSearchModal(meal)"
+              >
+                Añadir
+              </button>
             </div>
 
             @for (entry of getEntriesByMeal(meal); track entry.id) {
-              <div class="d-flex align-items-center bg-light px-3 py-2 rounded-3 mt-2">
-                <img [src]="(entry.food?.imageUrl || entry.recipe?.imageUrl) || 'assets/img/no-image-food.png'"
-                     (error)="handleImageError(entry)"
-                     class="rounded me-3"
-                     style="width: 80px; height: 80px; object-fit: cover;"
-                     alt="Imagen">
-
+              <div
+                class="d-flex align-items-center bg-light px-3 py-2 rounded-3 mt-2"
+              >
+                <img
+                  [src]="
+                    (entry.food?.imageUrl || entry.recipe?.imageUrl) ||
+                      'assets/img/no-image-food.png'
+                  "
+                  (error)="handleImageError(entry)"
+                  class="rounded me-3"
+                  style="width: 80px; height: 80px; object-fit: cover;"
+                  alt="Imagen"
+                />
 
                 <div class="flex-grow-1">
-                  <h6 class="mb-1">{{ entry.food?.name || entry.recipe?.name }}</h6>
-                  <small class="text-muted">Cantidad: {{ entry.quantity }} g</small>
+                  <h6 class="mb-1">
+                    {{ entry.food?.name || entry.recipe?.name }}
+                  </h6>
+                  <small class="text-muted">
+                    Cantidad: {{ entry.quantity }} g
+                  </small>
 
                   <div class="d-flex flex-wrap gap-2 mt-2">
-                    <span class="badge bg-light text-dark border">🔥 {{ calcular(entry, 'calories') }} kcal</span>
-                    <span class="badge bg-light text-dark border">🥩 {{ calcular(entry, 'protein') }}g Prot</span>
-                    <span class="badge bg-light text-dark border">🍞 {{ calcular(entry, 'carbs') }}g Carb</span>
-                    <span class="badge bg-light text-dark border">🧈 {{ calcular(entry, 'fat') }}g Grasa</span>
+                    <span class="badge bg-light text-dark border">
+                      🔥 {{ calcular(entry, 'calories') }} kcal
+                    </span>
+                    <span class="badge bg-light text-dark border">
+                      🥩 {{ calcular(entry, 'protein') }}g Prot
+                    </span>
+                    <span class="badge bg-light text-dark border">
+                      🍞 {{ calcular(entry, 'carbs') }}g Carb
+                    </span>
+                    <span class="badge bg-light text-dark border">
+                      🧈 {{ calcular(entry, 'fat') }}g Grasa
+                    </span>
                   </div>
                 </div>
 
-                <button class="btn btn-outline-danger btn-sm ms-2" (click)="deleteEntry(entry.id)">
+                <button
+                  class="btn btn-outline-danger btn-sm ms-2"
+                  (click)="deleteEntry(entry.id)"
+                >
                   <i class="bi bi-trash-fill"></i>
                 </button>
               </div>
@@ -48,15 +87,25 @@
         <div class="p-3 mt-4 bg-light rounded-3 text-center">
           <h5 class="mb-2">📊 Totales del día</h5>
           <div class="d-flex flex-wrap justify-content-center gap-3">
-            <span class="badge bg-success-subtle text-dark border">🔥 {{ total.calories }} kcal</span>
-            <span class="badge bg-success-subtle text-dark border">🥩 {{ total.protein }}g Proteínas</span>
-            <span class="badge bg-success-subtle text-dark border">🍞 {{ total.carbs }}g Carbohidratos</span>
-            <span class="badge bg-success-subtle text-dark border">🧈 {{ total.fat }}g Grasas</span>
+            <span class="badge bg-success-subtle text-dark border">
+              🔥 {{ total.calories }} kcal
+            </span>
+            <span class="badge bg-success-subtle text-dark border">
+              🥩 {{ total.protein }}g Proteínas
+            </span>
+            <span class="badge bg-success-subtle text-dark border">
+              🍞 {{ total.carbs }}g Carbohidratos
+            </span>
+            <span class="badge bg-success-subtle text-dark border">
+              🧈 {{ total.fat }}g Grasas
+            </span>
           </div>
         </div>
       </app-box>
     </div>
   </div>
 
-  <app-search-food-modal (itemSelected)="handleItemSelected($event)"></app-search-food-modal>
+  <app-search-food-modal
+    (itemSelected)="handleItemSelected($event)"
+  ></app-search-food-modal>
 </main>

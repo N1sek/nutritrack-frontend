@@ -18,27 +18,10 @@ export class NavbarComponent {
 
   goToLogin() {
     this.router.navigate(['/login']);
-    // this.router.navigate(['/dashboard']); // Temporal
   }
 
   goToRegister() {
     this.router.navigate(['/register']);
-  }
-
-  goToHome(){
-    this.router.navigate(['/dashboard']);
-  }
-
-  goToDiarioNutricion(){
-    this.router.navigate(['/diario-nutricion']);
-  }
-
-  goToInformes(){
-    this.router.navigate(['/reports']);
-  }
-
-  goToPerfil() {
-    this.router.navigate(['/perfil']);
   }
 
   logout(){
@@ -47,9 +30,6 @@ export class NavbarComponent {
 
   isLoggedIn(): boolean{
     return this.authService.isLoggedIn();
-  }
-  info(){
-    console.log(this.isLoggedIn());
   }
 
 

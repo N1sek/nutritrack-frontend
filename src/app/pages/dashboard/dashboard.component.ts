@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }[] = [];
 
   chartCalories?: Chart;
-  chartWeight?: Chart;
+  chartFasting?: Chart;
 
   private profileSub?: Subscription;
 
@@ -55,19 +55,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     const today = formatDate(new Date(), 'yyyy-MM-dd', 'en');
 
-    // 1) Obtener log diario (con entradas) del día actual
     this.dailyLogService.getDiary(today).subscribe({
       next: (res: DailyLogResponse) => {
-        // Totales del día (aseguramos fallback a 0/nulo)
         this.caloriesConsumed = Math.round(res.totalCalories || 0);
         this.proteinConsumed = Math.round(res.totalProtein || 0);
         this.carbsConsumed = Math.round(res.totalCarbs || 0);
         this.fatConsumed = Math.round(res.totalFat || 0);
 
-        // Horas de ayuno del día
         this.fastingHours = res.fastingHours || 0;
 
-        // Convertir entradas a lista simplificada
         this.recentEntries = (res.entries || []).map(entry => {
           const item = entry.food || entry.recipe;
           const qty = entry.quantity || 0;
@@ -93,7 +89,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-    // 2) Suscribirse a cambios de perfil (nombre, peso y recálculo de objetivos)
     this.profileSub = this.userService.profileChanged$.subscribe({
       next: (user: UserProfile | null) => {
         if (user) {
@@ -119,12 +114,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-    // Emitir perfil inicial
     this.userService.loadInitialProfile();
   }
 
   ngAfterViewInit(): void {
-    // 3) Cargar datos históricos para gráficas
     this.loadCharts();
   }
 
@@ -132,9 +125,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.profileSub?.unsubscribe();
   }
 
-  /**
-   * Calcula edad a partir de una fecha ISO (yyyy-MM-dd)
-   */
   private calculateAge(birthDateStr: string): number {
     const birth = new Date(birthDateStr);
     const today = new Date();
@@ -146,9 +136,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return age;
   }
 
-  /**
-   * Calcula el objetivo calórico usando fórmula de Harris-Benedict simplificada
-   */
   private calculateCalorieGoal(
     weight: number,
     height: number,
@@ -188,10 +175,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dailyLogService.getExistingLogsInRange(start, end).subscribe({
       next: (data: DailyLog[]) => {
         this.renderCaloriesChart(data);
-        this.renderWeightChart(data);
+        this.renderFastingChart(data);
       },
       error: () => {
-        // Omitimos error visual
+
       }
     });
   }
@@ -243,38 +230,44 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private renderWeightChart(data: DailyLog[]): void {
-    const weightData = data.filter(r => r.weight != null);
-    const labels = weightData.map(r => r.date);
-    const values = weightData.map(r => r.weight || 0);
-    const canvas = document.getElementById('pesoChart') as HTMLCanvasElement;
+  private renderFastingChart(data: DailyLog[]): void {
+    const fastingData = data.filter(r => r.fastingHours != null);
+    const labels = fastingData.map(r => r.date);
+    const values = fastingData.map(r => r.fastingHours || 0);
+    const canvas = document.getElementById('ayunoChart') as HTMLCanvasElement;
     if (!canvas) return;
-
-    if (this.chartWeight) {
-      this.chartWeight.data.labels = labels;
-      this.chartWeight.data.datasets = [
+    if (this.chartFasting) {
+      this.chartFasting.data.labels = labels;
+      this.chartFasting.data.datasets = [
         {
-          label: 'Peso (kg)',
+          label: 'Horas de ayuno',
           data: values,
-          backgroundColor: '#4eabf9'
+          backgroundColor: 'rgba(78, 171, 249, 0.2)',
+          borderColor: '#4eabf9',
+          fill: true
         }
-      ];
-      this.chartWeight.update();
+        ];
+      this.chartFasting.update();
     } else {
-      this.chartWeight = new Chart(canvas, {
-        type: 'bar',
+      this.chartFasting = new Chart(canvas, {
+        type: 'line',
         data: {
           labels,
           datasets: [
             {
-              label: 'Peso (kg)',
+              label: 'Horas de ayuno',
               data: values,
-              backgroundColor: '#4eabf9'
+              backgroundColor: 'rgba(78, 171, 249, 0.2)',
+              borderColor: '#4eabf9',
+              fill: true
             }
-          ]
+                ]
         },
         options: {
           scales: {
+            x: {
+              ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 }
+            },
             y: {
               beginAtZero: true
             }
@@ -284,7 +277,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // Getters para mostrar balances restantes
   get caloriesRemaining(): number {
     return this.calorieGoal - this.caloriesConsumed;
   }

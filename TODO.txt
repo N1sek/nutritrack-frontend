@@ -5,4 +5,6 @@ y mostrar un skeleton en su lugar
 
 - Spinner en el diario de comidas, al buscar alimento
 
-- Fix envio de edad perfil
+- Cambiar URL imagen por selector de archivo en crear receta modal.
+
+- Poder editar la receta, y pulsar la receta para abrirla y ver sus instrucciones, alimentos...

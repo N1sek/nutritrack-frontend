@@ -19,7 +19,8 @@
 
           <div class="text-center mb-3">
             @if (user) {
-              <img [src]="user.imageUrl || 'https://img.cryptorank.io/coins/arab_cat1706520810607.png'" class="rounded-circle" style="width: 120px; height: 120px;">
+              <img [src]="user.imageUrl || 'https://img.cryptorank.io/coins/arab_cat1706520810607.png'"
+                   class="rounded-circle" style="width: 120px; height: 120px;">
             }
             <input type="file" class="form-control mt-2" (change)="uploadImage($event)">
           </div>
@@ -47,8 +48,8 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label">Edad</label>
-                <input type="number" class="form-control" [(ngModel)]="user.age" name="age">
+                <label class="form-label">Fecha de nacimiento</label>
+                <input type="date" class="form-control" [(ngModel)]="user.birthDate" name="birthDate">
               </div>
 
               <div class="mb-3">

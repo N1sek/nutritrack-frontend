@@ -1,18 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { formatDate } from '@angular/common';
-import { environment } from '../../../environments/environment';
+import { BoxComponent } from '../../../shared/components/box/box.component';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { SearchFoodModalComponent } from '../../../shared/components/search-food-modal/search-food-modal.component';
-import {BoxComponent} from '../../../shared/components/box/box.component';
-import {NavbarComponent} from '../../../shared/components/navbar/navbar.component';
-import {DailyLogService} from '../../../core/daily-log.service';
+import { DailyLogService, DailyLogResponse } from '../../../core/daily-log.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-nutrition-diary',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     SearchFoodModalComponent,
     BoxComponent,
     NavbarComponent
@@ -28,46 +28,55 @@ export class NutritionDiaryComponent implements OnInit {
   meals = ['BREAKFAST', 'LUNCH', 'SNACK', 'DINNER'];
   loading = false;
 
-  constructor(private http: HttpClient, private dailyLogService: DailyLogService) {}
+  fastingHours: number | null = null;
+
+  constructor(private dailyLogService: DailyLogService) {}
+
   ngOnInit(): void {
     this.fetchDiary();
   }
 
-  fetchDiary() {
+  fetchDiary(): void {
     this.loading = true;
-    this.http.get(`${environment.apiUrl}/daily-log?date=${this.currentDate}`).subscribe({
-      next: (res: any) => {
+    this.dailyLogService.getDiary(this.currentDate).subscribe({
+      next: (res: DailyLogResponse) => {
         this.entries = res.entries || [];
+        this.fastingHours = res.fastingHours ?? 0;
         this.loading = false;
       },
       error: () => {
+        this.entries = [];
+        this.fastingHours = 0;
         this.loading = false;
       }
     });
   }
 
-  openSearchModal(mealType: string) {
+  openSearchModal(mealType: string): void {
     this.searchModal.openModal(mealType);
   }
 
-  handleItemSelected(entry: any) {
+  handleItemSelected(entry: any): void {
     const body = {
       date: this.currentDate,
-      entries: [entry]   // Solo envío la entrada nueva
+      fastingHours: this.fastingHours,
+      entries: [entry]
     };
 
     this.dailyLogService.saveOrUpdateDiary(body).subscribe({
-      next: () => this.fetchDiary()
+      next: () => this.fetchDiary(),
+      error: (err) => console.error('Error guardando entrada:', err)
     });
   }
 
-  deleteEntry(id: number) {
-    this.http.delete(`${environment.apiUrl}/daily-log/entry/${id}`).subscribe({
-      next: () => this.fetchDiary()
+  deleteEntry(id: number): void {
+    this.dailyLogService.deleteEntry(id).subscribe({
+      next: () => this.fetchDiary(),
+      error: (err) => console.error('Error borrando entrada:', err)
     });
   }
 
-  getEntriesByMeal(meal: string) {
+  getEntriesByMeal(meal: string): any[] {
     return this.entries.filter(e => e.mealType === meal);
   }
 
@@ -78,12 +87,30 @@ export class NutritionDiaryComponent implements OnInit {
 
   traducirMealType(meal: string): string {
     switch (meal) {
-      case 'BREAKFAST': return 'Desayuno';
-      case 'LUNCH': return 'Comida';
-      case 'DINNER': return 'Cena';
-      case 'SNACK': return 'Almuerzo';
-      default: return meal;
+      case 'BREAKFAST':
+        return 'Desayuno';
+      case 'LUNCH':
+        return 'Comida';
+      case 'DINNER':
+        return 'Cena';
+      case 'SNACK':
+        return 'Almuerzo';
+      default:
+        return meal;
     }
+  }
+
+  saveFastingHours(): void {
+    const body = {
+      date: this.currentDate,
+      fastingHours: this.fastingHours,
+      entries: []
+    };
+
+    this.dailyLogService.saveOrUpdateDiary(body).subscribe({
+      next: () => this.fetchDiary(),
+      error: (err) => console.error('Error guardando horas de ayuno:', err)
+    });
   }
 
   get total() {
@@ -91,23 +118,25 @@ export class NutritionDiaryComponent implements OnInit {
       (acc, e) => {
         const item = e.food || e.recipe;
         if (!item) {
-          // Si no hay food ni recipe, devolvemos el acumulador sin tocarlo
           return acc;
         }
         const q = (e.quantity || 0) / 100;
         acc.calories += (item.calories || 0) * q;
-        acc.protein  += (item.protein  || 0) * q;
-        acc.carbs    += (item.carbs    || 0) * q;
-        acc.fat      += (item.fat      || 0) * q;
+        acc.protein += (item.protein || 0) * q;
+        acc.carbs += (item.carbs || 0) * q;
+        acc.fat += (item.fat || 0) * q;
         return acc;
       },
       { calories: 0, protein: 0, carbs: 0, fat: 0 }
     );
   }
 
-  handleImageError(entry: any) {
-    if (entry.food) entry.food.imageUrl = 'assets/img/no-image-food.png';
-    if (entry.recipe) entry.recipe.imageUrl = 'assets/img/no-image-food.png';
+  handleImageError(entry: any): void {
+    if (entry.food) {
+      entry.food.imageUrl = 'assets/img/no-image-food.png';
+    }
+    if (entry.recipe) {
+      entry.recipe.imageUrl = 'assets/img/no-image-food.png';
+    }
   }
-
 }

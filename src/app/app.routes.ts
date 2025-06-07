@@ -7,7 +7,7 @@ import {RegisterComponent} from './pages/auth/register/register.component';
 import {NutritionDiaryComponent} from './pages/dashboard/nutrition-diary/nutrition-diary.component';
 import {RecipesComponent} from './pages/dashboard/recetas/recipes.component';
 import {ReportsComponent} from './pages/dashboard/reports/reports.component';
-import {PerfilComponent} from './pages/dashboard/perfil/perfil.component';
+import { UserComponent} from './pages/dashboard/user/user.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -17,6 +17,6 @@ export const routes: Routes = [
   { path: 'nutrition-diary', component: NutritionDiaryComponent, canActivate: [authGuard] },
   { path: 'recetas', component: RecipesComponent, canActivate: [authGuard] },
   { path: 'reports', component: ReportsComponent, canActivate: [authGuard] },
-  { path: 'perfil', component: PerfilComponent, canActivate: [authGuard] },
+  { path: 'user', component: UserComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

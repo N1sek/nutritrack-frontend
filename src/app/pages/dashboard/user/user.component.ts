@@ -1,19 +1,19 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { UserService } from '../../../core/user/user.service';
-import {FormsModule} from '@angular/forms';
-import {NavbarComponent} from '../../../shared/components/navbar/navbar.component';
+import { FormsModule } from '@angular/forms';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  templateUrl: './perfil.component.html',
-  styleUrl: './perfil.component.scss',
+  templateUrl: './user.component.html',
+  styleUrl: './user.component.scss',
   imports: [
     FormsModule,
     NavbarComponent
   ]
 })
-export class PerfilComponent implements OnInit {
+export class UserComponent implements OnInit {
   private userService = inject(UserService);
 
   user: any = null;
@@ -43,8 +43,8 @@ export class PerfilComponent implements OnInit {
     this.userService.getProfile().subscribe({
       next: (data) => {
         const age = this.calculateAge(data.birthDate);
-        const allergenMap: { [key: string]: boolean } = {};
 
+        const allergenMap: { [key: string]: boolean } = {};
         this.allergens.forEach(a => {
           allergenMap[a.name] = data.allergenIds.includes(a.id);
         });
@@ -84,7 +84,7 @@ export class PerfilComponent implements OnInit {
       weight: this.user.weight,
       goal: this.user.goal,
       activityLevel: this.user.activityLevel,
-      birthDate: this.user.birthDate, // mantenemos el valor original
+      birthDate: this.user.birthDate,
       allergenIds
     };
 
@@ -104,7 +104,6 @@ export class PerfilComponent implements OnInit {
     const file = event.target.files[0];
     if (file) {
       console.log('Imagen seleccionada:', file);
-      // Aquí implementaremos la lógica de subida en el futuro
     }
   }
 

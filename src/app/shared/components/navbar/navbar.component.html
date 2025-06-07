@@ -1,7 +1,7 @@
 @if (!isLoggedIn()) {
   <nav class="navbar navbar-expand-sm bg-white shadow-sm fixed-top">
     <div class="container-xxl">
-      <a class="navbar-brand fw-bold text-dark fs-4 " href="#" (click)="info()" role="button">
+      <a class="navbar-brand fw-bold text-dark fs-4 " href="#" role="button">
         NutriTrack
       </a>
 
@@ -27,7 +27,7 @@
 } @else {
   <nav class="navbar navbar-expand-sm bg-white shadow-sm fixed-top">
     <div class="container-xxl">
-      <a class="navbar-brand fw-bold text-dark fs-4 cursor-pointer" (click)="goToHome()" role="button">NutriTrack</a>
+      <a class="navbar-brand fw-bold text-dark fs-4 cursor-pointer" routerLink="/dashboard" routerLinkActive="link-primary" role="button">NutriTrack</a>
 
       <!-- Menu hamburguesa móviles -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavLoggedIn"
@@ -58,7 +58,7 @@
               <img src="https://img.cryptorank.io/coins/arab_cat1706520810607.png" class="rounded-circle" width="30" height="30" alt="Avatar">
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-              <li><a class="dropdown-item" (click)="goToPerfil()" role="button">Ajustes</a></li>
+              <li><a class="dropdown-item" routerLink="/user" routerLinkActive="link-primary" role="button">Ajustes</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
@@ -68,7 +68,7 @@
         </ul>
         <ul class="navbar-nav d-flex d-sm-none w-100 mt-3">
           <li class="nav-item w-100 d-flex justify-content-between align-items-center px-3 py-2 border-top">
-            <a class="nav-link d-flex align-items-center" (click)="goToPerfil()" role="button">
+            <a class="nav-link d-flex align-items-center" routerLink="/user" routerLinkActive="link-primary" role="button">
               <i class="bi bi-gear me-2"></i> Ajustes
             </a>
             <a class="nav-link text-danger d-flex align-items-center" href="#" (click)="logout()" role="button">
