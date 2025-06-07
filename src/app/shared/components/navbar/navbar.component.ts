@@ -1,36 +1,51 @@
-import { Component } from '@angular/core';
-import {Router, RouterLink, RouterLinkActive} from '@angular/router';
-import {AuthService} from '../../../core/auth/auth.service';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../../core/auth/auth.service';
+import { UserService, UserProfile } from '../../../core/user/user.service';
 
 @Component({
   selector: 'app-navbar',
+  standalone: true,
   imports: [
-    RouterLinkActive,
-    RouterLink
+    RouterLink,
+    RouterLinkActive
   ],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss'
+  styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
+  profile: UserProfile | null = null;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private userService: UserService
+  ) {}
 
+  ngOnInit(): void {
+    this.userService.profileChanged$.subscribe(user => {
+      this.profile = user;
+    });
+    this.userService.loadInitialProfile();
+  }
 
-  goToLogin() {
+  goToLogin(): void {
     this.router.navigate(['/login']);
   }
 
-  goToRegister() {
+  goToRegister(): void {
     this.router.navigate(['/register']);
   }
 
-  logout(){
-    return this.authService.logout();
+  logout(): void {
+    this.authService.logout();
   }
 
-  isLoggedIn(): boolean{
+  isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
   }
 
-
+  get isAdmin(): boolean {
+    return this.profile?.role === 'ADMIN';
+  }
 }

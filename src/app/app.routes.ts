@@ -8,6 +8,8 @@ import {NutritionDiaryComponent} from './pages/dashboard/nutrition-diary/nutriti
 import {RecipesComponent} from './pages/dashboard/recetas/recipes.component';
 import {ReportsComponent} from './pages/dashboard/reports/reports.component';
 import { UserComponent} from './pages/dashboard/user/user.component';
+import {UsersComponent} from './pages/admin/users/users.component';
+import {adminGuard} from './core/auth/admin.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -18,5 +20,8 @@ export const routes: Routes = [
   { path: 'recetas', component: RecipesComponent, canActivate: [authGuard] },
   { path: 'reports', component: ReportsComponent, canActivate: [authGuard] },
   { path: 'user', component: UserComponent, canActivate: [authGuard] },
+
+  { path: 'admin/users', component: UsersComponent, canActivate: [authGuard, adminGuard] },
+
   { path: '**', redirectTo: '' }
 ];

@@ -32,6 +32,10 @@ export class UserService {
     return this.http.get<UserProfile>(`${environment.apiUrl}/users/me`);
   }
 
+  public get currentProfile(): UserProfile | null {
+    return this.profileChangedSubject.value;
+  }
+
   updateProfile(data: Partial<UserProfile>): Observable<any> {
     return this.http.put<any>(`${environment.apiUrl}/users/me`, data).pipe(
       tap(() => {

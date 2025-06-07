@@ -3,8 +3,8 @@ y mostrar un skeleton en su lugar
 
 - Agregar dropwdown gramos o ml en cantidades
 
-- Spinner en el diario de comidas, al buscar alimento
+- Spinner en el daily log al buscar alimento
 
-- Cambiar URL imagen por selector de archivo en crear receta modal.
+- Cambiar URL imagen por selector de archivo (png, jpg...) en crear receta modal.
 
-- Poder editar la receta, y pulsar la receta para abrirla y ver sus instrucciones, alimentos...
+- Poder editar la receta, y pulsar la tarjeta de la receta para abrirla y ver sus instrucciones, alimentos...

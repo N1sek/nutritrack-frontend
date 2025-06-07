@@ -1,0 +1,67 @@
+<app-navbar></app-navbar>
+
+<main class="container-xxl py-5">
+  <h3 class="mb-4">👥 Gestión de Usuarios</h3>
+
+  <!-- Spinner mientras carga -->
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border"></div>
+    </div>
+  }
+
+  <!-- Tabla de usuarios -->
+  @if (!loading) {
+    <table class="table table-hover">
+      <thead class="table-light">
+      <tr>
+        <th>Nick</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (u of users; track u.id) {
+          <tr>
+            <td>{{ u.nickname }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              <select
+                class="form-select form-select-sm"
+                [(ngModel)]="u.role"
+                (change)="changeRole(u)"
+              >
+                @for (r of roles; track r) {
+                  <option [value]="r">{{ r }}</option>
+                }
+              </select>
+            </td>
+            <td>
+              <button
+                class="btn btn-sm"
+                [ngClass]="u.isActive ? 'btn-success' : 'btn-secondary'"
+                (click)="toggleEnabled(u)"
+              >
+                {{ u.isActive ? 'Sí' : 'No' }}
+              </button>
+            </td>
+            <td>
+              <button class="btn btn-danger btn-sm" (click)="deleteUser(u)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+        @if (users.length === 0) {
+          <tr>
+            <td colspan="5" class="text-center text-muted">
+              No hay usuarios para mostrar.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</main>
