@@ -1,0 +1,278 @@
+<app-navbar></app-navbar>
+
+<main class="container-xxl py-5">
+  <h3 class="mb-4 d-flex justify-content-between align-items-center">
+    👩‍🍳 Gestión de Alimentos
+    <button class="btn btn-primary" (click)="openFormModal()">
+      <i class="bi bi-plus-lg me-1"></i> Nuevo alimento
+    </button>
+  </h3>
+
+  <div class="row mb-3 gx-2">
+    <div class="col-sm-6 col-md-4">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Buscar por nombre..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="currentPage = 1"
+      />
+    </div>
+    <div class="col-sm-6 col-md-4">
+      <select
+        class="form-select"
+        [(ngModel)]="filterImported"
+        (ngModelChange)="currentPage = 1"
+      >
+        <option value="all">Todos</option>
+        <option value="imported">Importados</option>
+        <option value="local">Locales</option>
+      </select>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border"></div>
+    </div>
+  } @else {
+    <table class="table table-hover">
+      <thead class="table-light">
+      <tr>
+        <th>Nombre</th>
+        <th>Cal.</th>
+        <th>Prot.</th>
+        <th>Fat</th>
+        <th>Carb.</th>
+        <th>Imp.</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (food of pagedFoods; track food.id) {
+          <tr>
+            <td>{{ food.name }}</td>
+            <td>{{ food.calories }}</td>
+            <td>{{ food.protein }}</td>
+            <td>{{ food.fat }}</td>
+            <td>{{ food.carbs }}</td>
+            <td>
+              <span
+                class="badge"
+                [ngClass]="food.imageUrl ? 'bg-info' : 'bg-secondary'"
+              >
+                {{ food.imageUrl ? 'Ext.' : 'Loc.' }}
+              </span>
+            </td>
+            <td>
+              <button
+                class="btn btn-sm btn-outline-secondary me-1"
+                (click)="openFormModal(food)"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="confirmDelete(food)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="text-center text-muted">
+              No hay alimentos para mostrar.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <nav>
+      <ul class="pagination justify-content-center">
+        @for (page of pageNumbers; track page) {
+          <li class="page-item" [class.active]="page === currentPage">
+            <button class="page-link" (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+  }
+
+  <!-- Modal: Create / Edit -->
+  <div class="modal fade" #formModal tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ editingFood ? 'Editar alimento' : 'Nuevo alimento' }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Nombre</label>
+                <input
+                  class="form-control"
+                  required
+                  [(ngModel)]="foodFormData.name"
+                  name="name"
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">URL imagen</label>
+                <input
+                  class="form-control"
+                  [(ngModel)]="foodFormData.imageUrl"
+                  name="imageUrl"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Calorías</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  required
+                  [(ngModel)]="foodFormData.calories"
+                  name="calories"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Proteínas</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  required
+                  [(ngModel)]="foodFormData.protein"
+                  name="protein"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Grasas</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  required
+                  [(ngModel)]="foodFormData.fat"
+                  name="fat"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Carbohidratos</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  required
+                  [(ngModel)]="foodFormData.carbs"
+                  name="carbs"
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Azúcar</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="foodFormData.sugar"
+                  name="sugar"
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Sal</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="foodFormData.salt"
+                  name="salt"
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Saturadas</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="foodFormData.saturatedFat"
+                  name="saturatedFat"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="!foodFormData.name.trim()"
+            (click)="saveFood()"
+          >
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirm Delete -->
+  <div class="modal fade" #confirmModal tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          ¿Eliminar «{{ selectedFood?.name }}»?
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="onDeleteConfirmed()"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div
+    class="position-fixed bottom-0 end-0 p-3"
+    style="z-index: 1055"
+  >
+    <div
+      #toast
+      class="toast align-items-center text-white bg-primary border-0"
+      role="alert"
+    >
+      <div class="d-flex">
+        <div class="toast-body">{{ toastMessage }}</div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+          data-bs-dismiss="toast"
+        ></button>
+      </div>
+    </div>
+  </div>
+</main>

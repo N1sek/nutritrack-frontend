@@ -3,6 +3,27 @@
 <main class="container-xxl py-5">
   <h3 class="mb-4">👥 Gestión de Usuarios</h3>
 
+  <!-- Filtros: búsqueda y rol -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <input type="text"
+             class="form-control"
+             placeholder="Buscar por nick o email..."
+             [(ngModel)]="searchTerm"
+             (ngModelChange)="currentPage = 1">
+    </div>
+    <div class="col-md-4">
+      <select class="form-select"
+              [(ngModel)]="filterRole"
+              (ngModelChange)="currentPage = 1">
+        <option value="">Todos los roles</option>
+        @for (r of roles; track r) {
+          <option [value]="r">{{ r }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
   <!-- Spinner mientras carga -->
   @if (loading) {
     <div class="text-center py-5">
@@ -10,7 +31,7 @@
     </div>
   }
 
-  <!-- Tabla de usuarios -->
+  <!-- Tabla -->
   @if (!loading) {
     <table class="table table-hover">
       <thead class="table-light">
@@ -23,45 +44,108 @@
       </tr>
       </thead>
       <tbody>
-        @for (u of users; track u.id) {
+        @for (u of pagedUsers; track u.id) {
           <tr>
             <td>{{ u.nickname }}</td>
             <td>{{ u.email }}</td>
             <td>
-              <select
-                class="form-select form-select-sm"
-                [(ngModel)]="u.role"
-                (change)="changeRole(u)"
-              >
+              <select class="form-select form-select-sm"
+                      [(ngModel)]="u.role"
+                      (change)="changeRole(u)">
                 @for (r of roles; track r) {
                   <option [value]="r">{{ r }}</option>
                 }
               </select>
             </td>
             <td>
-              <button
-                class="btn btn-sm"
-                [ngClass]="u.isActive ? 'btn-success' : 'btn-secondary'"
-                (click)="toggleEnabled(u)"
-              >
-                {{ u.isActive ? 'Sí' : 'No' }}
+              <button class="btn btn-sm"
+                      [ngClass]="u.isActive ? 'btn-success' : 'btn-danger'"
+                      (click)="confirmAction(u,'toggle')">
+                {{ u.isActive ? 'Activo' : 'Inactivo' }}
               </button>
             </td>
             <td>
-              <button class="btn btn-danger btn-sm" (click)="deleteUser(u)">
+              <button class="btn btn-outline-danger btn-sm"
+                      (click)="confirmAction(u,'delete')">
                 Eliminar
               </button>
             </td>
           </tr>
         }
-        @if (users.length === 0) {
+        @if (filteredUsers.length === 0) {
           <tr>
             <td colspan="5" class="text-center text-muted">
-              No hay usuarios para mostrar.
+              No hay usuarios que mostrar.
             </td>
           </tr>
         }
       </tbody>
     </table>
+
+    <!-- Paginador -->
+    @if (totalPages > 1) {
+      <nav aria-label="Paginación usuarios">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="goToPage(currentPage - 1)">Anterior</button>
+          </li>
+          @for (p of pageNumbers; track p) {
+            <li class="page-item" [class.active]="p === currentPage">
+              <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+            </li>
+          }
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="goToPage(currentPage + 1)">Siguiente</button>
+          </li>
+        </ul>
+      </nav>
+    }
   }
+
+  <!-- Modal de confirmación -->
+  <div #confirmModal class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            @if (actionType === 'toggle') {
+              Confirmar estado
+            } @else {
+              Confirmar eliminación
+            }
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          @if (actionType === 'toggle') {
+            <p>
+              ¿Seguro que quieres
+              {{ selectedUser?.isActive ? 'desactivar' : 'activar' }}
+              a <strong>{{ selectedUser?.nickname }}</strong>?
+            </p>
+          } @else {
+            <p>
+              ¿Seguro que quieres eliminar a
+              <strong>{{ selectedUser?.nickname }}</strong>?
+            </p>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" (click)="onConfirm()">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div #toast class="toast" role="alert" aria-live="polite" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">NutriTrack</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+      </div>
+      <div class="toast-body">{{ toastMessage }}</div>
+    </div>
+  </div>
 </main>

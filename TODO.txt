@@ -8,3 +8,9 @@ y mostrar un skeleton en su lugar
 - Cambiar URL imagen por selector de archivo (png, jpg...) en crear receta modal.
 
 - Poder editar la receta, y pulsar la tarjeta de la receta para abrirla y ver sus instrucciones, alimentos...
+
+- A veces, al marcar como favorita una receta hay que recargar para que funcione.
+
+- Implementar (backend y frontend) la subida de imagen de perfil de usuario
+
+- Fixear el error 403 despues de cerrar sesion

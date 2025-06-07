@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
 import { UserService, UserProfile } from '../../../core/user/user.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [
-    RouterLink,
-    RouterLinkActive
-  ],
+  imports: [ CommonModule, RouterLink, RouterLinkActive ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  profile: UserProfile | null = null;
+  userImageUrl: string | null = null;
+  isAdmin = false;
+  private sub?: Subscription;
 
   constructor(
     private router: Router,
@@ -22,30 +23,33 @@ export class NavbarComponent implements OnInit {
     private userService: UserService
   ) {}
 
-  ngOnInit(): void {
-    this.userService.profileChanged$.subscribe(user => {
-      this.profile = user;
+  ngOnInit() {
+    // Carga inicial de perfil
+    this.userService.profileChanged$.subscribe((user: UserProfile | null) => {
+      if (user) {
+        this.userImageUrl = null;
+        this.isAdmin = user.role === 'ADMIN';
+      } else {
+        this.userImageUrl = null;
+        this.isAdmin = false;
+      }
     });
     this.userService.loadInitialProfile();
   }
 
-  goToLogin(): void {
+  goToLogin() {
     this.router.navigate(['/login']);
   }
 
-  goToRegister(): void {
+  goToRegister() {
     this.router.navigate(['/register']);
   }
 
-  logout(): void {
+  logout() {
     this.authService.logout();
   }
 
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
-  }
-
-  get isAdmin(): boolean {
-    return this.profile?.role === 'ADMIN';
   }
 }

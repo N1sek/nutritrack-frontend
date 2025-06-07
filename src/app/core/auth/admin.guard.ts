@@ -1,16 +1,34 @@
-import { CanActivateFn } from '@angular/router';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+// src/app/core/auth/admin.guard.ts
+import { inject, Injectable } from '@angular/core';
+import {
+  CanActivateFn,
+  Router,
+  UrlTree
+} from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { UserService } from '../user/user.service';
 
-export const adminGuard: CanActivateFn = (route, state) => {
-  const router = inject(Router);
-  const userService = inject(UserService);
-  const user = userService.currentProfile;
+@Injectable({ providedIn: 'root' })
+export class AdminGuard {
+  canActivate(): Observable<boolean | UrlTree> {
+    const userService = inject(UserService);
+    const router = inject(Router);
 
-  if (user?.role === 'ADMIN') {
-    return true;
+    return userService.getProfile().pipe(
+      map(user => {
+        if (user.role === 'ADMIN') {
+          return true;
+        }
+        return router.createUrlTree(['/']);
+      }),
+      catchError(() => {
+        return of(router.createUrlTree(['/']));
+      })
+    );
   }
-  router.navigate(['/dashboard']);
-  return false;
+}
+
+export const adminGuard: CanActivateFn = (...args) => {
+  return inject(AdminGuard).canActivate();
 };

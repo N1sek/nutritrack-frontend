@@ -1,5 +1,4 @@
 @if (!isLoggedIn()) {
-  <!-- Navbar para no autenticados… (igual que antes) -->
   <nav class="navbar navbar-expand-sm bg-white shadow-sm fixed-top">
     <div class="container-xxl">
       <a class="navbar-brand fw-bold text-dark fs-4" href="#" role="button">NutriTrack</a>
@@ -20,12 +19,13 @@
     </div>
   </nav>
 } @else {
-  <!-- Navbar para usuarios autenticados -->
   <nav class="navbar navbar-expand-sm bg-white shadow-sm fixed-top">
     <div class="container-xxl">
-      <a class="navbar-brand fw-bold text-dark fs-4 cursor-pointer"
-         routerLink="/dashboard"
-         role="button">
+      <a
+        class="navbar-brand fw-bold text-dark fs-4 cursor-pointer"
+        [routerLink]="isAdmin ? ['/admin/users'] : ['/dashboard']"
+        role="button"
+      >
         NutriTrack
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavLoggedIn"
@@ -34,7 +34,6 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarNavLoggedIn">
-
         <ul class="navbar-nav mx-auto">
           @if (!isAdmin) {
             <li class="nav-item me-3">
@@ -54,24 +53,28 @@
             <li class="nav-item me-3">
               <a class="nav-link" routerLink="/admin/users" routerLinkActive="link-primary">Usuarios</a>
             </li>
-            <!-- Aquí puedes añadir más enlaces de admin, p.ej. gestión de alimentos/recetas -->
+            <li class="nav-item me-3">
+              <a class="nav-link" routerLink="/admin/foods" routerLinkActive="link-primary">Alimentos</a>
+            </li>
           }
         </ul>
 
-        <!-- Dropdown perfil en desktop -->
+        <!-- Dropdown perfil escritorio -->
         <ul class="navbar-nav d-none d-sm-flex">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="profileDropdown"
                role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="https://img.cryptorank.io/coins/arab_cat1706520810607.png"
-                   class="rounded-circle" width="30" height="30" alt="Avatar">
+              <img
+                [src]="userImageUrl || 'https://placehold.co/30x30'"
+                class="rounded-circle"
+                width="30" height="30"
+                alt="Avatar"
+              />
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
               @if (!isAdmin) {
                 <li>
-                  <a class="dropdown-item" routerLink="/user">
-                    Ajustes
-                  </a>
+                  <a class="dropdown-item" routerLink="/user">Ajustes</a>
                 </li>
                 <li><hr class="dropdown-divider"></li>
               }
@@ -84,7 +87,7 @@
           </li>
         </ul>
 
-        <!-- Perfil / Cerrar sesión en móvil -->
+        <!-- Dropdown móvil -->
         <ul class="navbar-nav d-flex d-sm-none w-100 mt-3">
           <li class="nav-item w-100 d-flex justify-content-between align-items-center px-3 py-2 border-top">
             @if (!isAdmin) {
@@ -97,7 +100,6 @@
             </a>
           </li>
         </ul>
-
       </div>
     </div>
   </nav>

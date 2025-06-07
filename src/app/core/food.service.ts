@@ -1,4 +1,3 @@
-// src/app/core/food.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../environments/environment';
@@ -33,16 +32,15 @@ export interface FoodRequest {
 @Injectable({ providedIn: 'root' })
 export class FoodService {
   private readonly baseUrl = `${environment.apiUrl}/foods`;
+  private readonly adminBase  = `${environment.apiUrl}/admin/foods`;
 
   constructor(private http: HttpClient) {}
 
-  /** Busca solo en tu base de datos local */
   searchLocalFoods(query: string): Observable<FoodResponse[]> {
     const params = new HttpParams().set('query', query);
     return this.http.get<FoodResponse[]>(`${this.baseUrl}/search/local`, { params });
   }
 
-  /** Busca en la API externa con paginación */
   searchExternalFoods(
     query: string,
     page: number,
@@ -55,19 +53,41 @@ export class FoodService {
     return this.http.get<FoodResponse[]>(`${this.baseUrl}/search/external`, { params });
   }
 
-  /** Importa un alimento externo a tu base de datos local */
   importFood(food: any): Observable<FoodResponse> {
     return this.http.post<FoodResponse>(`${this.baseUrl}/import`, food);
   }
 
-  /** Crea un nuevo alimento en tu base de datos local */
   createFood(food: FoodRequest): Observable<FoodResponse> {
     return this.http.post<FoodResponse>(this.baseUrl, food);
   }
 
-  /** Busca combinando local + externa (sin paginar externals) */
   searchAllFoods(query: string): Observable<FoodResponse[]> {
     const params = new HttpParams().set('query', query);
     return this.http.get<FoodResponse[]>(`${this.baseUrl}/search`, { params });
+  }
+
+  /** Lista todos los alimentos (ADMIN) */
+  listAll(): Observable<FoodResponse[]> {
+    return this.http.get<FoodResponse[]>(this.adminBase);
+  }
+
+  /** Obtiene un alimento por ID (ADMIN) */
+  getOne(id: number): Observable<FoodResponse> {
+    return this.http.get<FoodResponse>(`${this.adminBase}/${id}`);
+  }
+
+  /** Crea un alimento (ADMIN) */
+  createAdmin(food: FoodRequest): Observable<FoodResponse> {
+    return this.http.post<FoodResponse>(this.adminBase, food);
+  }
+
+  /** Actualiza un alimento (ADMIN) */
+  updateAdmin(id: number, food: FoodRequest): Observable<FoodResponse> {
+    return this.http.put<FoodResponse>(`${this.adminBase}/${id}`, food);
+  }
+
+  /** Elimina un alimento (ADMIN) */
+  deleteAdmin(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.adminBase}/${id}`);
   }
 }

@@ -1,20 +1,25 @@
+// src/app/pages/auth/login/login.component.ts
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
-import {FormsModule} from '@angular/forms';
+import { UserService, UserProfile } from '../../../core/user/user.service';
 import {NavbarComponent} from '../../../shared/components/navbar/navbar.component';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
   imports: [
-    FormsModule,
-    NavbarComponent
-  ]
+    NavbarComponent,
+    FormsModule
+  ],
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private router = inject(Router);
 
   email = '';
   password = '';
@@ -28,32 +33,40 @@ export class LoginComponent {
     }
 
     this.loading = true;
-    this.error = null;
-
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
-        this.loading = false;
+        // Una vez tenemos el token, pedimos el perfil
+        this.userService.getProfile().subscribe({
+          next: (user: UserProfile) => {
+            this.loading = false;
+            if (user.role === 'ADMIN') {
+              this.router.navigate(['/admin/users']);
+            } else {
+              this.router.navigate(['/dashboard']);
+            }
+          },
+          error: () => {
+            this.loading = false;
+            // Si falla al cargar perfil, al menos vamos al dashboard
+            this.router.navigate(['/dashboard']);
+          }
+        });
       },
-      error: (err) => {
+      error: err => {
         this.loading = false;
-
         if (err.status === 400) {
-          this.showError(err.error?.message || 'Correo o contraseña incorrectos.');
+          this.showError(err.error?.message || 'Credenciales incorrectas.');
         } else if (err.status === 0) {
-          this.showError('No se pudo conectar al servidor. Verifica tu conexión.');
+          this.showError('No se pudo conectar al servidor.');
         } else {
-          this.showError('Ocurrió un error inesperado. Intenta nuevamente.');
+          this.showError('Error inesperado. Intenta de nuevo.');
         }
-
-        console.error('Error al iniciar sesión:', err);
       }
     });
   }
 
-  private showError(message: string) {
-    this.error = message;
-    setTimeout(() => {
-      this.error = null;
-    }, 4000);
+  private showError(msg: string) {
+    this.error = msg;
+    setTimeout(() => (this.error = null), 4000);
   }
 }
