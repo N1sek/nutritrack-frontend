@@ -1,5 +1,5 @@
 // src/app/pages/dashboard/recetas/components/recipe-card/recipe-card.component.ts
-import { Component, Input } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { RecipeService} from '../../../../../core/recipe.service';
 import { finalize } from 'rxjs/operators';
 
@@ -18,9 +18,9 @@ export class RecipeCardComponent {
   @Input() imageUrl!: string;
   @Input() tags!: string[];
   @Input() mealType!: string;
-
-  // Recibimos true/false desde el padre, que ahora le pasa `recipe.favorited`
   @Input() isFavorite: boolean = false;
+
+  @Output() view = new EventEmitter<number>();
 
   isToggling: boolean = false;
 
@@ -42,5 +42,9 @@ export class RecipeCardComponent {
         console.error('Error al marcar/desmarcar favorito:', err);
       }
     });
+  }
+
+  viewDetails() {
+    this.view.emit(this.id);
   }
 }

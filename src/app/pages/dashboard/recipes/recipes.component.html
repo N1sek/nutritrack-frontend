@@ -26,6 +26,8 @@
         </div>
       </div>
 
+
+
       @for (recipe of filteredRecipes; track recipe.id) {
         <app-recipe-card
           [id]="recipe.id"
@@ -37,7 +39,9 @@
           [imageUrl]="recipe.imageUrl || 'assets/img/no-image-food.png'"
           [tags]="recipe.tags || []"
           [mealType]="recipe.mealType"
-          [isFavorite]="recipe.favorited">
+          [isFavorite]="recipe.favorited"
+          (view) = "detailModal.openModal($event)"
+        >
         </app-recipe-card>
       }
     </div>
@@ -68,7 +72,7 @@
     </div>
   }
 
-  <!-- Paginación -->
+  <!-- Paginacion -->
   <nav class="mt-4 d-flex justify-content-center">
     <ul class="pagination">
       <li class="page-item" [class.disabled]="currentPage === 0">
@@ -89,4 +93,5 @@
 
 
   <app-create-recipe-modal (recipeCreated)="onRecipeCreated()"></app-create-recipe-modal>
+  <app-recipe-detail-modal #detailModal></app-recipe-detail-modal>
 </main>

@@ -5,6 +5,7 @@ import { RecipeFiltersComponent } from './components/recipe-filters/recipe-filte
 import { RecipeListComponent } from './components/recipe-list/recipe-list.component';
 import { CreateRecipeModalComponent } from '../../../shared/components/create-recipe-modal/create-recipe-modal.component';
 import { RecipeService } from '../../../core/recipe.service';
+import {RecipeDetailModalComponent} from '../../../shared/components/recipe-detail-modal/recipe-detail-modal.component';
 
 @Component({
   selector: 'app-recetas',
@@ -14,7 +15,8 @@ import { RecipeService } from '../../../core/recipe.service';
     RecipeCardComponent,
     RecipeFiltersComponent,
     RecipeListComponent,
-    CreateRecipeModalComponent
+    CreateRecipeModalComponent,
+    RecipeDetailModalComponent
   ],
   templateUrl: './recipes.component.html'
 })
@@ -43,7 +45,7 @@ export class RecipesComponent {
     this.recipeService.getAllRecipes(this.currentPage, this.pageSize).subscribe({
       next: (res) => {
         this.recipes = res.content;
-        this.totalPages = res.totalPages;
+        this.totalPages = Math.ceil(res.totalItems / this.pageSize);
         this.filteredRecipes = [...this.recipes];
       },
       error: (err) => console.error('Error al cargar recetas:', err)

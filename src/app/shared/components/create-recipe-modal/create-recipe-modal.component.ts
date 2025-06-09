@@ -8,6 +8,13 @@ import { RecipeService } from '../../../core/recipe.service';
 
 declare const bootstrap: any;
 
+interface Ingredient {
+  food: any;
+  quantity: number;
+  unit: 'g' | 'ml';
+  customNutrition?: any;
+}
+
 @Component({
   selector: 'app-create-recipe-modal',
   standalone: true,
@@ -21,10 +28,10 @@ export class CreateRecipeModalComponent {
   private foodService = inject(FoodService);
   private recipeService = inject(RecipeService);
 
-  // paso del modal (1=info, 2=ingredientes)
+  // paso actual del modal (1=info básica, 2=ingredientes)
   step = 1;
 
-  // búsqueda de alimentos
+  // búsqueda de ingredientes
   searchQuery = '';
   private activeQuery = '';
   private searchSubject = new Subject<string>();
@@ -33,23 +40,26 @@ export class CreateRecipeModalComponent {
   externalSize = 10;
   hasMoreExternal = true;
 
-  // resultados
   localResults: any[] = [];
   externalResults: any[] = [];
   mergedResults: any[] = [];
 
-  // formulario receta
+  // formulario de receta
   form = {
     name: '',
     description: '',
     instructions: '',
     imageUrl: '',
+    imageFile: null as File | null,
     mealType: 'LUNCH',
     isPublic: true,
-    ingredients: [] as { food: any; quantity: number; customNutrition?: any }[]
+    ingredients: [] as Ingredient[]
   };
 
-  // edición de nutrición
+  // preview de la imagen seleccionada
+  imagePreview: string | null = null;
+
+  // edición de valores de nutrición por ingrediente
   editingIndex: number | null = null;
   customNutrition = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
@@ -57,21 +67,21 @@ export class CreateRecipeModalComponent {
   total = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
   constructor() {
-    // configurar debounce de búsqueda
+    // debounce para búsqueda
     this.searchSubject
       .pipe(debounceTime(500), distinctUntilChanged())
-      .subscribe(query => {
-        const q = query.trim();
-        if (!q) {
+      .subscribe(q => {
+        const trimmed = q.trim();
+        if (!trimmed) {
           this.clearSearch();
           return;
         }
-        this.activeQuery = q;
+        this.activeQuery = trimmed;
         this.externalPage = 1;
         this.hasMoreExternal = true;
         this.loadingExternal = true;
-        this.fetchLocalFoods(q);
-        this.fetchExternalFoods(q);
+        this.fetchLocalFoods(trimmed);
+        this.fetchExternalFoods(trimmed);
       });
   }
 
@@ -81,22 +91,21 @@ export class CreateRecipeModalComponent {
     new bootstrap.Modal(modalEl).show();
   }
 
-  /** Cambiar de paso */
-  goToStep(step: number) {
-    this.step = step;
-    if (step === 2) {
-      // reset búsqueda al entrar al paso 2
+  /** Cambia de paso */
+  goToStep(n: number) {
+    this.step = n;
+    if (n === 2) {
       this.searchQuery = '';
       this.clearSearch();
     }
   }
 
-  /** Handler de input de búsqueda */
+  /** Handler para el input de búsqueda */
   onSearchQueryChange() {
     this.searchSubject.next(this.searchQuery);
   }
 
-  /** Limpia resultados de búsqueda */
+  /** Limpia los resultados de búsqueda */
   private clearSearch() {
     this.localResults = [];
     this.externalResults = [];
@@ -125,15 +134,13 @@ export class CreateRecipeModalComponent {
         } else {
           this.externalResults = [...this.externalResults, ...res];
         }
-        if (res.length < this.externalSize) {
-          this.hasMoreExternal = false;
-        }
+        this.hasMoreExternal = res.length === this.externalSize;
         this.loadingExternal = false;
         this.mergeResults();
       });
   }
 
-  /** Cargar siguiente página de externos */
+  /** Carga siguiente página de externos */
   loadMoreExternalFoods() {
     if (this.loadingExternal || !this.hasMoreExternal) return;
     this.externalPage++;
@@ -141,7 +148,7 @@ export class CreateRecipeModalComponent {
     this.fetchExternalFoods(this.activeQuery);
   }
 
-  /** Unir locales primero, luego externos sin duplicados */
+  /** Mezcla resultados locales + externos sin duplicados */
   private mergeResults() {
     const seen = new Set<string>();
     const all: any[] = [];
@@ -150,26 +157,27 @@ export class CreateRecipeModalComponent {
       const key = `${f.name.toLowerCase()}|${f.imageUrl || ''}`;
       if (!seen.has(key)) {
         seen.add(key);
-        all.push({ ...f, tempQuantity: 100 });
+        all.push({ ...f, tempQuantity: 100, tempUnit: 'g' as 'g' | 'ml' });
       }
     }
     for (const f of this.externalResults) {
       const key = `${f.name.toLowerCase()}|${f.imageUrl || ''}`;
       if (!seen.has(key)) {
         seen.add(key);
-        all.push({ ...f, tempQuantity: 100 });
+        all.push({ ...f, tempQuantity: 100, tempUnit: 'g' as 'g' | 'ml' });
       }
     }
 
     this.mergedResults = all;
   }
 
-  /** Añadir ingrediente (importa si no tiene id) */
+  /** Añade ingrediente (importa si viene de externo) */
   addIngredient(food: any) {
-    const quantity = food.tempQuantity || 100;
+    const qty  = food.tempQuantity || 100;
+    const unit = food.tempUnit || 'g';
     const finalize = (f: any) => {
-      if (!this.form.ingredients.some(i => i.food.id === f.id)) {
-        this.form.ingredients.push({ food: f, quantity });
+      if (!this.form.ingredients.find(i => i.food.id === f.id)) {
+        this.form.ingredients.push({ food: f, quantity: qty, unit });
         this.updateTotal();
       }
     };
@@ -177,24 +185,26 @@ export class CreateRecipeModalComponent {
     if (!food.id) {
       this.foodService.importFood(food).subscribe({
         next: finalize,
-        error: err => console.error('Error importar alimento:', err)
+        error: err => console.error('Error al importar alimento:', err)
       });
     } else {
       finalize(food);
     }
   }
 
-  /** Editar valores custom de nutrición */
-  startEditNutrition(index: number) {
-    this.editingIndex = index;
-    const base = this.form.ingredients[index].customNutrition || this.form.ingredients[index].food;
+  /** Inicio edición de nutrición */
+  startEditNutrition(idx: number) {
+    this.editingIndex = idx;
+    const base = this.form.ingredients[idx].customNutrition || this.form.ingredients[idx].food;
     this.customNutrition = {
       calories: base.calories ?? 0,
-      protein: base.protein ?? 0,
-      carbs: base.carbs ?? 0,
-      fat: base.fat ?? 0
+      protein:  base.protein  ?? 0,
+      carbs:    base.carbs    ?? 0,
+      fat:      base.fat      ?? 0
     };
   }
+
+  /** Confirma edición nutricional */
   confirmEditNutrition() {
     if (this.editingIndex !== null) {
       this.form.ingredients[this.editingIndex].customNutrition = { ...this.customNutrition };
@@ -202,30 +212,32 @@ export class CreateRecipeModalComponent {
       this.updateTotal();
     }
   }
+
+  /** Cancela edición nutricional */
   cancelEditNutrition() {
     this.editingIndex = null;
   }
 
-  /** Cambiar qty de ingrediente */
-  updateIngredientQuantity(index: number, qty: number) {
+  /** Actualiza cantidad de ingrediente */
+  updateIngredientQuantity(idx: number, qty: number) {
     if (qty > 0) {
-      this.form.ingredients[index].quantity = qty;
+      this.form.ingredients[idx].quantity = qty;
       this.updateTotal();
     }
   }
 
-  /** Quitar ingrediente */
-  removeIngredient(index: number) {
-    this.form.ingredients.splice(index, 1);
+  /** Elimina ingrediente */
+  removeIngredient(idx: number) {
+    this.form.ingredients.splice(idx, 1);
     this.updateTotal();
   }
 
-  /** Recalcular totales */
+  /** Recalcula totales del conjunto de ingredientes */
   private updateTotal() {
     const tot = { calories: 0, protein: 0, carbs: 0, fat: 0 };
-    for (const i of this.form.ingredients) {
-      const f = i.customNutrition || i.food;
-      const factor = i.quantity / 100;
+    for (const ing of this.form.ingredients) {
+      const f      = ing.customNutrition || ing.food;
+      const factor = ing.quantity / 100;
       tot.calories += (f.calories || 0) * factor;
       tot.protein  += (f.protein  || 0) * factor;
       tot.carbs    += (f.carbs    || 0) * factor;
@@ -239,54 +251,83 @@ export class CreateRecipeModalComponent {
     };
   }
 
-  /** Enviar receta al backend */
-  submitRecipe() {
-    const invalid = this.form.ingredients.find(i => !i.food?.id);
-    if (invalid) {
-      console.error('Ingrediente sin ID:', invalid);
+  /** Maneja selección de fichero de imagen */
+  onFileSelected(evt: Event) {
+    const inp = (evt.target as HTMLInputElement);
+    if (!inp.files || inp.files.length === 0) {
+      this.form.imageFile = null;
+      this.imagePreview = null;
       return;
     }
+    const file = inp.files[0];
+    this.form.imageFile = file;
 
-    const payload = {
-      name: this.form.name,
-      description: this.form.description,
-      instructions: this.form.instructions,
-      imageUrl: this.form.imageUrl,
-      mealType: this.form.mealType,
-      isPublic: this.form.isPublic,
-      ingredients: this.form.ingredients.map(i => ({
-        foodId: i.food.id,
-        quantity: i.quantity
-      }))
-    };
-
-    this.recipeService.createRecipe(payload).subscribe({
-      next: created => {
-        this.recipeCreated.emit(created);
-        const modal = bootstrap.Modal.getInstance(document.getElementById('createRecipeModal')!);
-        modal?.hide();
-        this.resetForm();
-      },
-      error: err => console.error('Error crear receta:', err)
-    });
+    const reader = new FileReader();
+    reader.onload = () => this.imagePreview = reader.result as string;
+    reader.readAsDataURL(file);
   }
 
-  /** Reset completo del formulario */
+  /** Envía la receta (sube imagen si hay fichero) */
+  submitRecipe() {
+    const finishCreate = () => {
+      const payload = {
+        name:         this.form.name,
+        description:  this.form.description,
+        instructions: this.form.instructions,
+        imageUrl:     this.form.imageUrl,
+        mealType:     this.form.mealType,
+        isPublic:     this.form.isPublic,
+        ingredients:  this.form.ingredients.map(i => ({
+          foodId:   i.food.id,
+          quantity: i.quantity,
+          unit:     i.unit
+        }))
+      };
+      this.recipeService.createRecipe(payload).subscribe({
+        next: created => {
+          this.recipeCreated.emit(created);
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById('createRecipeModal')!
+          );
+          modal?.hide();
+          this.resetForm();
+        },
+        error: err => console.error('Error crear receta:', err)
+      });
+    };
+
+    if (this.form.imageFile) {
+      // Asegúrate de implementar uploadImage en RecipeService
+      this.recipeService.uploadImage(this.form.imageFile).subscribe({
+        next: url => {
+          this.form.imageUrl = url;
+          finishCreate();
+        },
+        error: err => console.error('Error al subir imagen:', err)
+      });
+    } else {
+      finishCreate();
+    }
+  }
+
+  /** Resetea todo el formulario */
   private resetForm() {
     this.form = {
-      name: '',
-      description: '',
+      name:         '',
+      description:  '',
       instructions: '',
-      imageUrl: '',
-      mealType: 'LUNCH',
-      isPublic: true,
-      ingredients: []
+      imageUrl:     '',
+      imageFile:    null,
+      mealType:     'LUNCH',
+      isPublic:     true,
+      ingredients:  []
     };
-    this.step = 1;
-    this.searchQuery = '';
+    this.imagePreview     = null;
+    this.step             = 1;
+    this.searchQuery      = '';
     this.clearSearch();
-    this.editingIndex = null;
-    this.customNutrition = { calories: 0, protein: 0, carbs: 0, fat: 0 };
-    this.total = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    this.editingIndex     = null;
+    this.customNutrition  = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    this.total            = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   }
 }

@@ -1,0 +1,85 @@
+<!-- recipe-detail-modal.component.html -->
+<div class="modal fade" #modalReceta tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content rounded-4">
+
+      <!-- CABECERA -->
+      <div class="modal-header">
+        <h5 class="modal-title">{{ recipe?.name }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Cerrar"></button>
+      </div>
+
+      <!-- CUERPO -->
+      <div class="modal-body">
+
+        <!-- Imagen grande -->
+        @if (recipe?.imageUrl) {
+          <div class="text-center mb-4">
+            <img
+              [src]="recipe?.imageUrl"
+              alt="{{ recipe?.name }}"
+              class="img-fluid rounded"
+              style="max-height:300px; object-fit:cover;"
+            >
+          </div>
+        }
+
+        <!-- Descripción -->
+        @if (recipe?.description) {
+          <p class="mb-3">{{ recipe?.description }}</p>
+        }
+
+        <!-- Instrucciones -->
+        @if (recipe?.instructions) {
+          <h6 class="mb-2">📋 Instrucciones</h6>
+          <p class="mb-4">{{ recipe?.instructions }}</p>
+        }
+
+        <!-- Ingredientes -->
+        <h6 class="mb-2">🍽️ Ingredientes</h6>
+        <ul class="list-group mb-4">
+          @for (ing of recipe?.ingredients || []; track ing.food.id) {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                {{ ing.food.name }} — {{ ing.quantity }} {{ ing.unit || 'g' }}
+              </div>
+              <small class="text-muted">
+                🔥 {{ ((ing.food.calories||0) * ing.quantity/100) | number:'1.0-0' }} kcal |
+                🥩 {{ ((ing.food.protein||0)  * ing.quantity/100) | number:'1.0-0' }} g |
+                🍞 {{ ((ing.food.carbs||0)    * ing.quantity/100) | number:'1.0-0' }} g |
+                🧈 {{ ((ing.food.fat||0)      * ing.quantity/100) | number:'1.0-0' }} g
+              </small>
+            </li>
+          }
+        </ul>
+
+        <!-- Totales + botón diario -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <span class="badge bg-primary me-1">🔥 {{ recipe?.calories | number:'1.0-0' }} kcal</span>
+            <span class="badge bg-success me-1">🥩 {{ recipe?.protein  | number:'1.0-0' }} g</span>
+            <span class="badge bg-warning me-1">🍞 {{ recipe?.carbs    | number:'1.0-0' }} g</span>
+            <span class="badge bg-danger">🧈 {{ recipe?.fat      | number:'1.0-0' }} g</span>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm" (click)="addToDailyLog()">
+            <i class="bi bi-journal-plus me-1"></i> Añadir al diario
+          </button>
+        </div>
+
+        <!-- Meta datos (creador, fecha, favoritos) -->
+        <div class="text-muted small">
+          @if(recipe?.createdBy) { <div>🧑‍🍳 Creada por: {{ recipe?.createdBy }}</div> }
+          @if(recipe?.createdAt) { <div>📅 Fecha: {{ recipe?.createdAt | date:'medium' }}</div> }
+          @if(recipe?.favoritesCount !== undefined) { <div>❤️ Favoritos: {{ recipe?.favoritesCount }}</div> }
+        </div>
+
+      </div>
+
+      <!-- PIE -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
+      </div>
+
+    </div>
+  </div>
+</div>

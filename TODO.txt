@@ -1,16 +1,26 @@
 - Al buscar alimentos, si se busca una palabra y luego se borra el input para buscar otra, eliminar de la lista actual los alimentos
-y mostrar un skeleton en su lugar
+y mostrar un skeleton en su lugar -> Low Priority
 
-- Agregar dropwdown gramos o ml en cantidades
+- Agregar dropwdown gramos o ml en cantidades al agregar alimento (bien sea desde modal de receta o alimento) -> Hecho
 
-- Spinner en el daily log al buscar alimento
+- Spinner en el daily log al buscar alimento -> Low Priority
 
-- Cambiar URL imagen por selector de archivo (png, jpg...) en crear receta modal.
+- Cambiar URL imagen por selector de archivo (png, jpg...) en crear receta modal e implementar la subida en backend -> Hecho
 
-- Poder editar la receta, y pulsar la tarjeta de la receta para abrirla y ver sus instrucciones, alimentos...
+- Poder editar la receta, y pulsar la tarjeta de la receta para abrirla y ver sus instrucciones, alimentos... -> High Priority
 
-- A veces, al marcar como favorita una receta hay que recargar para que funcione.
+- Cuando marco una receta como favorita, hay que recargar la pagina para que se aplique en el frontend. Si marco la receta como favorita pero NO recargo la pagina, en el backend si aparece como favorita pero en el frontend NO. -> High Priority
 
 - Implementar (backend y frontend) la subida de imagen de perfil de usuario
 
 - Fixear el error 403 despues de cerrar sesion
+
+- Crear pagina de Alimentos, en los que se puede hacer una busqueda de todos los alimentos para consultarlos, y tambien crearlos.
+
+- Mover navbar solo al index.html para evitar importar el navbar en cada componente
+
+- Validaciones en todos los formularios (login, registro, modales...)
+
+- Boton de mostrar password
+
+- Tests unitarios

@@ -1,4 +1,3 @@
-<!-- src/app/shared/components/create-recipe-modal/create-recipe-modal.component.html -->
 <div class="modal fade" id="createRecipeModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content rounded-4">
@@ -8,7 +7,6 @@
       </div>
       <div class="modal-body pt-3">
 
-        <!-- PASO 1: Información básica -->
         @if (step === 1) {
           <h6 class="mb-3">📝 Información básica</h6>
 
@@ -35,11 +33,21 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label">URL de la imagen</label>
-            <input type="text"
+            <label class="form-label">Imagen de la receta</label>
+            <input type="file"
                    class="form-control"
-                   [(ngModel)]="form.imageUrl">
+                   accept="image/png, image/jpeg"
+                   (change)="onFileSelected($event)">
           </div>
+
+          @if (imagePreview) {
+            <div class="mb-3 text-center">
+              <img [src]="imagePreview"
+                   alt="Vista previa de la receta"
+                   class="img-fluid rounded"
+                   style="max-height:200px;">
+            </div>
+          }
 
           <div class="mb-3">
             <label class="form-label">Tipo de comida</label>
@@ -68,7 +76,6 @@
           </div>
         }
 
-        <!-- PASO 2: Añadir ingredientes -->
         @if (step === 2) {
           <h6 class="mb-3">🍽️ Ingredientes</h6>
 
@@ -82,7 +89,7 @@
                    (ngModelChange)="onSearchQueryChange()">
           </div>
 
-          <!-- Skeleton inicial -->
+          <!-- Skeleton -->
           @if (loadingExternal && mergedResults.length === 0) {
             @for (_ of [1,2,3,4]; track _) {
               <div class="list-group-item placeholder-glow mb-2 rounded-3">
@@ -97,7 +104,7 @@
             }
           }
 
-          <!-- Resultados de búsqueda -->
+          <!-- Resultados de busqueda -->
           @if (mergedResults.length > 0) {
             <div class="list-group mb-2">
               @for (food of mergedResults; track food.name + '|' + food.imageUrl) {
@@ -111,9 +118,9 @@
                     <strong>{{ food.name }}</strong>
                     <div class="text-muted small">
                       🔥 {{ food.calories || 0 }} kcal |
-                      🥩 {{ food.protein || 0 }} g |
-                      🍞 {{ food.carbs || 0 }} g |
-                      🧈 {{ food.fat || 0 }} g
+                      🥩 {{ food.protein   || 0 }} g |
+                      🍞 {{ food.carbs     || 0 }} g |
+                      🧈 {{ food.fat       || 0 }} g
                     </div>
                   </div>
                   <div class="d-flex align-items-center gap-2">
@@ -123,7 +130,11 @@
                              min="1"
                              step="1"
                              [(ngModel)]="food.tempQuantity">
-                      <span class="input-group-text">g</span>
+                      <select class="form-select form-select-sm"
+                              [(ngModel)]="food.tempUnit">
+                        <option value="g">g</option>
+                        <option value="ml">ml</option>
+                      </select>
                     </div>
                     <button class="btn btn-outline-success btn-sm"
                             (click)="addIngredient(food)">
@@ -134,7 +145,7 @@
               }
             </div>
 
-            <!-- Spinner mientras carga más -->
+            <!-- Spinner mientras carga mas -->
             @if (loadingExternal) {
               <div class="text-center mb-2">
                 <div class="spinner-border spinner-border-sm text-primary"></div>
@@ -142,7 +153,7 @@
               </div>
             }
 
-            <!-- Botón Cargar más -->
+
             @if (!loadingExternal && hasMoreExternal) {
               <div class="text-center mb-4">
                 <button class="btn btn-outline-primary btn-sm"
@@ -172,10 +183,10 @@
                     <div>
                       <strong>{{ ing.food.name }}</strong>
                       <div class="text-muted small">
-                        🔥 {{ (ing.customNutrition?.calories ?? ing.food.calories) || 0 }} kcal |
-                        🥩 {{ (ing.customNutrition?.protein  ?? ing.food.protein ) || 0 }} g |
-                        🍞 {{ (ing.customNutrition?.carbs    ?? ing.food.carbs   ) || 0 }} g |
-                        🧈 {{ (ing.customNutrition?.fat      ?? ing.food.fat    ) || 0 }} g
+                        🔥 {{ (ing.customNutrition?.calories ?? ing.food.calories)||0 }} kcal |
+                        🥩 {{ (ing.customNutrition?.protein  ?? ing.food.protein )||0 }} g |
+                        🍞 {{ (ing.customNutrition?.carbs    ?? ing.food.carbs   )||0 }} g |
+                        🧈 {{ (ing.customNutrition?.fat      ?? ing.food.fat    )||0 }} g
                       </div>
                     </div>
                   </div>
@@ -187,7 +198,11 @@
                              step="1"
                              [ngModel]="ing.quantity"
                              (ngModelChange)="updateIngredientQuantity(form.ingredients.indexOf(ing), $event)">
-                      <span class="input-group-text">g</span>
+                      <select class="form-select form-select-sm"
+                              [(ngModel)]="ing.unit">
+                        <option value="g">g</option>
+                        <option value="ml">ml</option>
+                      </select>
                     </div>
                     <button class="btn btn-outline-secondary btn-sm"
                             (click)="startEditNutrition(form.ingredients.indexOf(ing))">
@@ -244,7 +259,7 @@
             }
           </ul>
 
-          <!-- Totales del día -->
+          <!-- Totales estimados -->
           <div class="bg-light p-3 rounded border mb-3 text-center">
             <h6 class="mb-2">⚖️ Totales estimados</h6>
             <div class="d-flex flex-wrap gap-3 justify-content-center">

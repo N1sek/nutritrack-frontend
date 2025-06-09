@@ -5,7 +5,7 @@ import {authGuard} from './core/auth/auth.guard';
 import {LoginComponent} from './pages/auth/login/login.component';
 import {RegisterComponent} from './pages/auth/register/register.component';
 import {NutritionDiaryComponent} from './pages/dashboard/nutrition-diary/nutrition-diary.component';
-import {RecipesComponent} from './pages/dashboard/recetas/recipes.component';
+import {RecipesComponent} from './pages/dashboard/recipes/recipes.component';
 import {ReportsComponent} from './pages/dashboard/reports/reports.component';
 import { UserComponent} from './pages/dashboard/user/user.component';
 import {UsersComponent} from './pages/admin/users/users.component';
