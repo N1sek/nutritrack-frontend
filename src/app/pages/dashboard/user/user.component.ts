@@ -100,11 +100,33 @@ export class UserComponent implements OnInit {
     });
   }
 
-  uploadImage(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      console.log('Imagen seleccionada:', file);
-    }
+  uploadImage(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.user.avatarUrl = reader.result;
+    };
+    reader.readAsDataURL(file);
+
+    const form = new FormData();
+    form.append('file', file);
+
+    this.userService.uploadAvatar(form).subscribe({
+      next: () => {
+        this.success = 'Avatar actualizado correctamente.';
+        this.error   = null;
+        this.loadProfile();
+        setTimeout(() => this.success = null, 4000);
+      },
+      error: () => {
+        this.error   = 'Error al subir el avatar.';
+        this.success = null;
+        setTimeout(() => this.error = null, 4000);
+      }
+    });
   }
 
   changePassword() {

@@ -27,7 +27,7 @@ export class NavbarComponent implements OnInit {
     // Carga inicial de perfil
     this.userService.profileChanged$.subscribe((user: UserProfile | null) => {
       if (user) {
-        this.userImageUrl = null;
+        this.userImageUrl = user.avatarUrl || null;
         this.isAdmin = user.role === 'ADMIN';
       } else {
         this.userImageUrl = null;

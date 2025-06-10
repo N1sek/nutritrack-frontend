@@ -88,16 +88,16 @@
           <h5 class="mb-2">📊 Totales del día</h5>
           <div class="d-flex flex-wrap justify-content-center gap-3">
             <span class="badge bg-success-subtle text-dark border">
-              🔥 {{ total.calories }} kcal
+              🔥 {{ total.calories | number:'1.0-2' }} kcal
             </span>
             <span class="badge bg-success-subtle text-dark border">
-              🥩 {{ total.protein }}g Proteínas
+              🥩 {{ total.protein | number:'1.0-2' }}g Proteínas
             </span>
             <span class="badge bg-success-subtle text-dark border">
-              🍞 {{ total.carbs }}g Carbohidratos
+              🍞 {{ total.carbs | number:'1.0-2' }}g Carbohidratos
             </span>
             <span class="badge bg-success-subtle text-dark border">
-              🧈 {{ total.fat }}g Grasas
+              🧈 {{ total.fat | number:'1.0-2' }}g Grasas
             </span>
           </div>
         </div>

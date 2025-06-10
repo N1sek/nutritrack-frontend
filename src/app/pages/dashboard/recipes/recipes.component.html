@@ -41,6 +41,7 @@
           [mealType]="recipe.mealType"
           [isFavorite]="recipe.favorited"
           (view) = "detailModal.openModal($event)"
+          (favoriteChanged)="onFavoriteChanged(recipe.id, $event)"
         >
         </app-recipe-card>
       }
@@ -58,6 +59,7 @@
 
       @for (recipe of filteredRecipes; track recipe.id) {
         <app-recipe-list
+          [id]="recipe.id"
           [name]="recipe.name"
           [calories]="recipe.calories"
           [proteins]="recipe.protein"
@@ -66,7 +68,10 @@
           [imageUrl]="recipe.imageUrl || 'assets/img/no-image-food.png'"
           [tags]="recipe.tags || []"
           [mealType]="recipe.mealType"
-          [isFavorite]="recipe.favorited">
+          [isFavorite]="recipe.favorited"
+          (view) = "detailModal.openModal($event)"
+          (favoriteChanged)="onFavoriteChanged(recipe.id, $event)"
+        >
         </app-recipe-list>
       }
     </div>

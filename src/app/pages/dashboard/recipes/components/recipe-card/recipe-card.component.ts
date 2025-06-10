@@ -20,6 +20,7 @@ export class RecipeCardComponent {
   @Input() mealType!: string;
   @Input() isFavorite: boolean = false;
 
+  @Output() favoriteChanged = new EventEmitter<boolean>();
   @Output() view = new EventEmitter<number>();
 
   isToggling: boolean = false;
@@ -27,9 +28,7 @@ export class RecipeCardComponent {
   constructor(private recipeService: RecipeService) {}
 
   toggleFavorite() {
-    if (this.isToggling || this.id == null) {
-      return;
-    }
+    if (this.isToggling) return;
     this.isToggling = true;
 
     this.recipeService.toggleFavorite(this.id).pipe(
@@ -37,10 +36,9 @@ export class RecipeCardComponent {
     ).subscribe({
       next: () => {
         this.isFavorite = !this.isFavorite;
+        this.favoriteChanged.emit(this.isFavorite);
       },
-      error: (err: any) => {
-        console.error('Error al marcar/desmarcar favorito:', err);
-      }
+      error: err => console.error('Error al marcar/desmarcar favorito:', err)
     });
   }
 

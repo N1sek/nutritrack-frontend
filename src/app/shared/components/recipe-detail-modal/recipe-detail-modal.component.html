@@ -1,5 +1,4 @@
-<!-- recipe-detail-modal.component.html -->
-<div class="modal fade" #modalReceta tabindex="-1" aria-hidden="true">
+<div #modalReceta id="modalReceta" class="modal fade" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content rounded-4">
 
@@ -32,7 +31,7 @@
         <!-- Instrucciones -->
         @if (recipe?.instructions) {
           <h6 class="mb-2">📋 Instrucciones</h6>
-          <p class="mb-4">{{ recipe?.instructions }}</p>
+          <pre class="mb-4" style="white-space: pre-wrap;">{{ recipe?.instructions }}</pre>
         }
 
         <!-- Ingredientes -->
@@ -53,23 +52,51 @@
           }
         </ul>
 
-        <!-- Totales + botón diario -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div>
-            <span class="badge bg-primary me-1">🔥 {{ recipe?.calories | number:'1.0-0' }} kcal</span>
-            <span class="badge bg-success me-1">🥩 {{ recipe?.protein  | number:'1.0-0' }} g</span>
-            <span class="badge bg-warning me-1">🍞 {{ recipe?.carbs    | number:'1.0-0' }} g</span>
-            <span class="badge bg-danger">🧈 {{ recipe?.fat      | number:'1.0-0' }} g</span>
+        <!-- Separador antes de la acción -->
+        <hr class="my-4">
+
+        <!-- Selección de tipo de comida y cantidad + botón -->
+        <div class="row align-items-center gx-3">
+          <div class="col-md-5">
+            <label class="form-label small text-muted">Tipo de comida</label>
+            <select class="form-select form-select-sm" [(ngModel)]="selectedMealType">
+              <option value="BREAKFAST">Desayuno</option>
+              <option value="LUNCH">Comida</option>
+              <option value="DINNER">Cena</option>
+              <option value="SNACK">Snack</option>
+            </select>
           </div>
-          <button class="btn btn-outline-secondary btn-sm" (click)="addToDailyLog()">
-            <i class="bi bi-journal-plus me-1"></i> Añadir al diario
-          </button>
+          <div class="col-md-5">
+            <label class="form-label small text-muted">Cantidad</label>
+            <div class="input-group input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="selectedQuantity"
+                min="1"
+                aria-label="Cantidad en gramos">
+              <span class="input-group-text">g</span>
+            </div>
+          </div>
+          <div class="col-md-2 text-end">
+            <button class="btn btn-outline-secondary btn-sm mt-4" (click)="addToDailyLog()">
+              <i class="bi bi-journal-plus me-1"></i> Añadir al diario
+            </button>
+          </div>
         </div>
 
-        <!-- Meta datos (creador, fecha, favoritos) -->
-        <div class="text-muted small">
+        <!-- Totales al lado o debajo, de forma discreta -->
+        <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+          <span class="badge bg-primary-subtle text-dark border">🔥 {{ recipe?.calories | number:'1.0-0' }} kcal</span>
+          <span class="badge bg-success-subtle text-dark border">🥩 {{ recipe?.protein  | number:'1.0-0' }} g</span>
+          <span class="badge bg-warning-subtle text-dark border">🍞 {{ recipe?.carbs    | number:'1.0-0' }} g</span>
+          <span class="badge bg-danger-subtle text-dark border">🧈 {{ recipe?.fat      | number:'1.0-0' }} g</span>
+        </div>
+
+        <!-- Meta datos -->
+        <div class="text-muted small mt-4">
           @if(recipe?.createdBy) { <div>🧑‍🍳 Creada por: {{ recipe?.createdBy }}</div> }
-          @if(recipe?.createdAt) { <div>📅 Fecha: {{ recipe?.createdAt | date:'medium' }}</div> }
+          @if(recipe?.createdAt)  { <div>📅 Fecha: {{ recipe?.createdAt | date:'medium' }}</div> }
           @if(recipe?.favoritesCount !== undefined) { <div>❤️ Favoritos: {{ recipe?.favoritesCount }}</div> }
         </div>
 
@@ -77,7 +104,7 @@
 
       <!-- PIE -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="closeModal()">Cerrar</button>
       </div>
 
     </div>

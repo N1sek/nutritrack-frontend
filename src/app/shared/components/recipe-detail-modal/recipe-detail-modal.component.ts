@@ -1,29 +1,30 @@
-// recipe-detail-modal.component.ts
 import { Component, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecipeService, Recipe } from '../../../core/recipe.service';
-import * as bootstrap from 'bootstrap';
-import {Modal} from 'bootstrap';
-
-
+import { DailyLogService } from '../../../core/daily-log.service';
+import { Modal } from 'bootstrap';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-recipe-detail-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './recipe-detail-modal.component.html',
   styleUrls: ['./recipe-detail-modal.component.scss']
 })
 export class RecipeDetailModalComponent implements AfterViewInit {
-  @ViewChild('modalReceta', { static: true }) modalRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('modalReceta', { static: true }) modalRef!: ElementRef<HTMLElement>;
   private modal!: Modal;
 
   recipe: Recipe | null = null;
+  selectedMealType: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK' = 'LUNCH';
+  selectedQuantity = 100;
+
   private recipeService = inject(RecipeService);
+  private dailyLogService = inject(DailyLogService);
 
   ngAfterViewInit() {
-    this.modal = new Modal(this.modalRef.nativeElement, { backdrop: true });
-    // Cuando se oculte limpiamos el objeto para no tener restos
+    this.modal = new Modal(this.modalRef.nativeElement, { backdrop: true, keyboard: true });
     this.modalRef.nativeElement.addEventListener('hidden.bs.modal', () => {
       this.recipe = null;
     });
@@ -33,30 +34,56 @@ export class RecipeDetailModalComponent implements AfterViewInit {
     this.recipeService.getRecipeById(recipeId).subscribe({
       next: data => {
         this.recipe = data;
-        // inicializa/obtiene y muestra el modal
-        const modalEl = document.getElementById('modalReceta')!;
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl, {
-          backdrop: true,
-          keyboard: true,
-          focus: true
-        });
-        modal.show();
+        // reset defaults each time
+        this.selectedMealType = 'LUNCH';
+        this.selectedQuantity = 100;
+        this.modal.show();
       },
       error: err => console.error('Error cargando detalle de receta:', err)
     });
   }
 
   closeModal() {
-    const modalEl = document.getElementById('modalReceta')!;
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    if (modal) {
-      modal.hide();
-      modal.dispose();  // limpia también el backdrop
-    }
+    this.modal.hide();
   }
 
   addToDailyLog() {
-    console.log('Añadir receta al diario:', this.recipe?.id);
-    // implementar más adelante
+    if (!this.recipe) return;
+    const entry = {
+      recipeId: this.recipe.id,
+      quantity: this.selectedQuantity,
+      mealType: this.selectedMealType
+    };
+    const payload = {
+      date: new Date().toISOString().split('T')[0],
+      entries: [entry]
+    };
+    this.dailyLogService.saveOrUpdateDiary(payload).subscribe({
+      next: () => {
+        this.modal.hide();
+        this.showToast(`Receta «${this.recipe!.name}» añadida al diario.`);
+      },
+      error: err => {
+        console.error('Error al añadir al diario:', err);
+        this.showToast('No se pudo añadir al diario.', 'danger');
+      }
+    });
+  }
+
+  private showToast(message: string, variant: 'success' | 'danger' = 'success') {
+    const toastEl = document.createElement('div');
+    toastEl.className = `toast align-items-center text-bg-${variant} border-0 position-fixed bottom-0 end-0 m-3`;
+    toastEl.setAttribute('role', 'alert');
+    toastEl.setAttribute('aria-live', 'assertive');
+    toastEl.setAttribute('aria-atomic', 'true');
+    toastEl.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body">${message}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+      </div>
+    `;
+    document.body.appendChild(toastEl);
+    (window as any).bootstrap.Toast.getOrCreateInstance(toastEl).show();
+    toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
   }
 }

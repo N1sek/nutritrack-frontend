@@ -1,5 +1,3 @@
-// src/app/pages/dashboard/reports/reports.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import Chart from 'chart.js/auto';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
@@ -7,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { BoxComponent } from '../../../shared/components/box/box.component';
 import { CommonModule } from '@angular/common';
 import { DailyLogService, DailyLog } from '../../../core/daily-log.service';
+import {HttpClient, HttpParams} from '@angular/common/http';
+
 
 @Component({
   selector: 'app-reports',
@@ -15,7 +15,7 @@ import { DailyLogService, DailyLog } from '../../../core/daily-log.service';
     CommonModule,
     NavbarComponent,
     FormsModule,
-    BoxComponent
+    BoxComponent,
   ],
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.scss']
@@ -32,7 +32,7 @@ export class ReportsComponent implements OnInit {
   private caloriesChart?: Chart;
   private macrosChart?: Chart;
 
-  constructor(private dailyLogService: DailyLogService) {}
+  constructor(private dailyLogService: DailyLogService, private http: HttpClient) {}
 
   ngOnInit(): void {
     this.today = new Date().toISOString().substring(0, 10);
@@ -212,7 +212,28 @@ export class ReportsComponent implements OnInit {
   }
 
   exportReport(format: 'csv' | 'excel' | 'pdf'): void {
-    console.log(`Export report to ${format} from ${this.startDate} to ${this.endDate}`);
-    // llamada real al backend para generar CSV/Excel/PDF.
+    const params = new HttpParams()
+      .set('start', this.startDate)
+      .set('end',   this.endDate)
+      .set('format', format);
+
+    this.http.get('/api/v1/daily-log/export', {
+      params,
+      responseType: 'blob'
+    }).subscribe({
+      next: blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const ext = format === 'excel' ? 'xlsx' : format;
+        a.download = `informe_${this.startDate}_a_${this.endDate}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: err => console.error('Error exportando informe:', err)
+    });
   }
+
 }

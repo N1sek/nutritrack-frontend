@@ -69,6 +69,16 @@ export class RecipesComponent {
     this.isGridView = window.innerWidth >= 768;
   }
 
+  onFavoriteChanged(id: number, isFav: boolean) {
+    const updateArr = (arr: any[]) => {
+      const r = arr.find(x => x.id === id);
+      if (r) { r.favorited = isFav; }
+    };
+    updateArr(this.recipes);
+    updateArr(this.filteredRecipes);
+    // this.applyFilters(this.currentFilters);
+  }
+
   applyFilters(filters: any) {
     this.filteredRecipes = this.recipes.filter(recipe => {
       if (filters.searchQuery && !recipe.name.toLowerCase().includes(filters.searchQuery.toLowerCase())) return false;
