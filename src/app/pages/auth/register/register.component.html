@@ -9,143 +9,248 @@
           <register-stepper [currentStep]="step"></register-stepper>
         </div>
 
-        <div>
-          @if (step === 1) {
-            <h2 class="text-center mb-4">Crear Cuenta</h2>
-
-            <button class="btn btn-primary w-100 mb-3">
-              Registrarse con Google
-            </button>
-
-            <div class="text-center position-relative my-3">
-              <span class="px-3 bg-white position-relative z-1">o</span>
-              <div class="position-absolute top-50 start-0 w-100 border-bottom"></div>
+        <!-- STEP 1 -->
+        @if (step === 1) {
+          <h2 class="text-center mb-4">Crear Cuenta</h2>
+          <form [formGroup]="step1Form" (ngSubmit)="nextStep()">
+            <div class="mb-3">
+              <label class="form-label">Correo Electrónico</label>
+              <input
+                type="email"
+                formControlName="email"
+                class="form-control"
+                [class.is-invalid]="step1Form.get('email')?.invalid && step1Form.get('email')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="step1Form.get('email')?.errors?.['required']">
+                El email es obligatorio.
+              </div>
+              <div class="invalid-feedback" *ngIf="step1Form.get('email')?.errors?.['email']">
+                Formato inválido.
+              </div>
             </div>
 
-            <form (submit)="nextStep($event)">
-              <div class="mb-3">
-                <label class="form-label">Correo Electrónico</label>
-                <input type="email" class="form-control" [(ngModel)]="form.email" name="email" required>
+            <div class="mb-3">
+              <label class="form-label">Contraseña</label>
+              <div class="input-group">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  formControlName="password"
+                  class="form-control"
+                  [class.is-invalid]="
+            step1Form.get('password')?.invalid &&
+            step1Form.get('password')?.touched
+          "
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="toggleShowPassword()"
+                  [attr.aria-label]="
+            showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+          "
+                >
+                  <i
+                    class="bi"
+                    [class.bi-eye]="!showPassword"
+                    [class.bi-eye-slash]="showPassword"
+                  ></i>
+                </button>
               </div>
-              <div class="mb-3">
-                <label class="form-label">Contraseña</label>
-                <input type="password" class="form-control" [(ngModel)]="form.password" name="password" required>
+              <div
+                class="invalid-feedback"
+                *ngIf="step1Form.get('password')?.errors?.['required']"
+              >
+                La contraseña es obligatoria.
               </div>
-              <div class="mb-3">
-                <label class="form-label">Confirmar Contraseña</label>
-                <input type="password" class="form-control" [(ngModel)]="form.confirmPassword" name="confirmPassword" required>
+              <div
+                class="invalid-feedback d-block"
+                *ngIf="step1Form.get('password')?.errors?.['pattern']"
+              >
+                La contraseña debe contener al menos 8 caracteres, incluyendo mayúscula,
+                minúscula y número.
               </div>
-              <button type="submit" class="btn btn-primary w-100">Continuar</button>
-            </form>
-          }
+            </div>
 
-          @if (step === 2) {
-            <h2 class="text-center mb-4">📝 Datos Personales</h2>
+            <div class="mb-3">
+              <label class="form-label">Confirmar Contraseña</label>
+              <input
+                type="password"
+                formControlName="confirmPassword"
+                class="form-control"
+                [class.is-invalid]="step1Form.errors?.['mismatch'] && step1Form.get('confirmPassword')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="step1Form.errors?.['mismatch']">
+                Las contraseñas no coinciden.
+              </div>
+            </div>
 
-            <form (submit)="nextStep($event)">
-              <div class="mb-3">
-                <label class="form-label">Nombre</label>
-                <input type="text" class="form-control" [(ngModel)]="form.name" name="name" required>
+            <button type="submit" class="btn btn-primary w-100">Continuar</button>
+          </form>
+        }
+
+        <!-- STEP 2 -->
+        @if (step === 2) {
+          <h2 class="text-center mb-4">📝 Datos Personales</h2>
+          <form [formGroup]="step2Form" (ngSubmit)="nextStep()">
+            <div class="mb-3">
+              <label class="form-label">Nombre</label>
+              <input
+                type="text"
+                formControlName="name"
+                class="form-control"
+                [class.is-invalid]="step2Form.get('name')?.invalid && step2Form.get('name')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="step2Form.get('name')?.errors?.['required']">
+                El nombre es obligatorio.
               </div>
-              <div class="mb-3">
-                <label class="form-label">Nickname</label>
-                <input type="text" class="form-control" [(ngModel)]="form.nickname" name="nickname" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Nickname</label>
+              <input
+                type="text"
+                formControlName="nickname"
+                class="form-control"
+                [class.is-invalid]="step2Form.get('nickname')?.invalid && step2Form.get('nickname')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="step2Form.get('nickname')?.errors?.['required']">
+                El nickname es obligatorio.
               </div>
-              <div class="mb-3 d-flex">
-                <div class="me-2 w-50">
-                  <label class="form-label">Peso (kg)</label>
-                  <input type="number" class="form-control" [(ngModel)]="form.weight" name="weight" required>
+            </div>
+
+            <div class="mb-3 d-flex gap-2">
+              <div class="w-50">
+                <label class="form-label">Peso (kg)</label>
+                <input
+                  type="number"
+                  formControlName="weight"
+                  class="form-control"
+                  [class.is-invalid]="step2Form.get('weight')?.invalid && step2Form.get('weight')?.touched"
+                >
+                <div class="invalid-feedback" *ngIf="step2Form.get('weight')?.errors?.['required']">
+                  El peso es obligatorio.
                 </div>
-                <div class="w-50">
-                  <label class="form-label">Altura (cm)</label>
-                  <input type="number" class="form-control" [(ngModel)]="form.height" name="height" required>
+              </div>
+              <div class="w-50">
+                <label class="form-label">Altura (cm)</label>
+                <input
+                  type="number"
+                  formControlName="height"
+                  class="form-control"
+                  [class.is-invalid]="step2Form.get('height')?.invalid && step2Form.get('height')?.touched"
+                >
+                <div class="invalid-feedback" *ngIf="step2Form.get('height')?.errors?.['required']">
+                  La altura es obligatoria.
                 </div>
               </div>
-              <div class="mb-3">
-                <label class="form-label">Fecha de Nacimiento</label>
-                <input type="date" class="form-control" [(ngModel)]="form.birthDate" name="birthDate" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Fecha de Nacimiento</label>
+              <input
+                type="date"
+                formControlName="birthDate"
+                class="form-control"
+                [class.is-invalid]="step2Form.get('birthDate')?.invalid && step2Form.get('birthDate')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="step2Form.get('birthDate')?.errors?.['required']">
+                Fecha obligatoria.
               </div>
+            </div>
 
-              <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" (click)="prevStep($event)">Volver</button>
-                <button type="submit" class="btn btn-primary">Continuar</button>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary" (click)="prevStep()">Volver</button>
+              <button type="submit" class="btn btn-primary">Continuar</button>
+            </div>
+          </form>
+        }
+
+        <!-- STEP 3 -->
+        @if (step === 3) {
+          <h2 class="text-center mb-4">🎯 Objetivo y Actividad</h2>
+          <form [formGroup]="step3Form" (ngSubmit)="nextStep()">
+            <div class="mb-3">
+              <label class="form-label">Objetivo</label>
+              <select
+                formControlName="goal"
+                class="form-select"
+                [class.is-invalid]="step3Form.get('goal')?.invalid && step3Form.get('goal')?.touched"
+              >
+                <option value="">Selecciona…</option>
+                <option value="GAIN">Ganar Masa Muscular</option>
+                <option value="MAINTAIN">Mantener Peso</option>
+                <option value="LOSE">Perder Peso</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="step3Form.get('goal')?.errors?.['required']">
+                Obligatorio.
               </div>
-            </form>
-          }
+            </div>
 
-          @if (step === 3) {
-            <h2 class="text-center mb-4">🎯 Objetivo y Actividad</h2>
-
-            <form (submit)="nextStep($event)">
-              <div class="mb-3">
-                <label class="form-label">Objetivo</label>
-                <select class="form-select" [(ngModel)]="form.goal" name="goal" required>
-                  <option value="GAIN">Ganar Masa Muscular</option>
-                  <option value="MAINTAIN">Mantener Peso</option>
-                  <option value="LOSE">Perder Peso</option>
-                </select>
+            <div class="mb-3">
+              <label class="form-label">Nivel de Actividad</label>
+              <select
+                formControlName="activityLevel"
+                class="form-select"
+                [class.is-invalid]="step3Form.get('activityLevel')?.invalid && step3Form.get('activityLevel')?.touched"
+              >
+                <option value="">Selecciona…</option>
+                <option value="SEDENTARY">Sedentario</option>
+                <option value="MODERATE">Moderado</option>
+                <option value="ACTIVE">Activo</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="step3Form.get('activityLevel')?.errors?.['required']">
+                Obligatorio.
               </div>
-              <div class="mb-3">
-                <label class="form-label">Nivel de Actividad</label>
-                <select class="form-select" [(ngModel)]="form.activityLevel" name="activityLevel" required>
-                  <option value="SEDENTARY">Sedentario</option>
-                  <option value="MODERATE">Moderado</option>
-                  <option value="ACTIVE">Activo</option>
-                </select>
-              </div>
+            </div>
 
-              <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" (click)="prevStep($event)">Volver</button>
-                <button type="submit" class="btn btn-primary">Continuar</button>
-              </div>
-            </form>
-          }
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary" (click)="prevStep()">Volver</button>
+              <button type="submit" class="btn btn-primary">Continuar</button>
+            </div>
+          </form>
+        }
 
-          @if (step === 4) {
-            <h2 class="text-center mb-4">🚫 Alergenos</h2>
-
-            <form (submit)="submitRegister($event)">
-              <div class="mb-3">
-                <label class="form-label">Selecciona tus alérgenos</label>
-                <div class="row">
-                  @for (allergen of allergens; track allergen) {
-                    <div class="col-6">
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox"
-                               [id]="'allergen' + allergen.name"
-                               [(ngModel)]="form.allergens[allergen.id]"
-                               [name]="'allergens' + allergen.id">
-                        <label class="form-check-label" [for]="'allergen' + allergen.name">
-                          {{ allergen.icon }} {{ allergen.name }}
-                        </label>
-                      </div>
-                    </div>
-                  }
+        <!-- STEP 4 -->
+        @if (step === 4) {
+          <h2 class="text-center mb-4">🚫 Alergenos</h2>
+          <form [formGroup]="step4Form" (ngSubmit)="submitRegister()">
+            <div formGroupName="allergens" class="row">
+              @for (allergen of allergens; track allergen.id) {
+                <div class="col-6">
+                  <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           [id]="'allergen'+allergen.id"
+                           [formControlName]="allergen.id.toString()">
+                    <label class="form-check-label" [for]="'allergen'+allergen.id">
+                      {{allergen.icon}} {{allergen.name}}
+                    </label>
+                  </div>
                 </div>
-              </div>
-
-              <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" (click)="prevStep($event)">Volver</button>
-                <button type="submit" class="btn btn-success">Finalizar Registro</button>
-              </div>
-            </form>
-          }
-        </div>
+              }
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-secondary" (click)="prevStep()">Volver</button>
+              <button type="submit" class="btn btn-success">Finalizar Registro</button>
+            </div>
+          </form>
+        }
 
       </div>
     </div>
   </div>
 </div>
 
-
-<div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
-  <div class="toast align-items-center text-white bg-{{ toastType }} border-0" role="alert" [class.show]="toastVisible">
+<!-- Bootstrap Toast -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index:1100">
+  <div
+    class="toast align-items-center text-white bg-{{toastType}} border-0"
+    role="alert"
+    [class.show]="toastVisible"
+  >
     <div class="d-flex">
-      <div class="toast-body">
-        {{ toastMessage }}
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="hideToast()"></button>
+      <div class="toast-body">{{toastMessage}}</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto"
+              (click)="hideToast()"></button>
     </div>
   </div>
 </div>
-

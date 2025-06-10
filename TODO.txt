@@ -1,30 +1,31 @@
-- Al buscar alimentos, si se busca una palabra y luego se borra el input para buscar otra, eliminar de la lista actual los alimentos
-y mostrar un skeleton en su lugar -> Low Priority
+========================================
+           TODOs Nutritrack
+========================================
 
-- Agregar dropwdown gramos o ml en cantidades al agregar alimento (bien sea desde modal de receta o alimento) -> HECHO
+[HECHO]
+----------------------------------------------------
+- Agregar dropdown de gramos o ml al añadir alimento (modal) [HECHO]
+- Cambiar URL de imagen por selector de archivo en “Crear receta” e implementar subida en backend [HECHO]
+- Poder editar la receta y, al pulsar la tarjeta, ver sus instrucciones y alimentos [HECHO]
+- Implementar subida de imagen de perfil de usuario (backend y frontend) [HECHO]
+- Implementar descarga de reportes en Excel, PDF o CSV [HECHO]
+- Fixear error 403 al cerrar sesión [HECHO]
+- Validación en registro de usuarios (login/registro) [HECHO]
+- Corregir la recarga tras marcar receta como favorita para reflejar el cambio en frontend [HECHO]
+- Añadir botón de mostrar/ocultar contraseña en formularios [HECHO]
 
-- Spinner en el daily log al buscar alimento -> Low Priority
+[MEJORAS / BAJA PRIORIDAD]
+------------------------------------------------------
+- Al buscar alimentos: al borrar el input, limpiar la lista actual y mostrar skeleton [Low Priority]
+- Spinner en el daily log al buscar alimento [Low Priority]
+- En la descarga de informes, agregar más datos a exportar [Low Priority]
+- Validar en “tiempo real” si existe un email o nickname [Low Priority / Mejora]
+- Desarrollar tests unitarios para asegurar la calidad del código
 
-- Cambiar URL imagen por selector de archivo (png, jpg...) en crear receta modal e implementar la subida en backend -> HECHO
+[PRIORIDAD ALTA]
+------------------------------------------------------
+- Apartados en el perfil de usuario: “Mis recetas”, “Mis alimentos”…
+- Crear página de Alimentos con búsqueda y creación de ítems
+- Mover el navbar solo al index.html para no importarlo en cada componente
+- Implementar validaciones en todos los formularios (login, registro, modales…)
 
-- Poder editar la receta, y pulsar la tarjeta de la receta para abrirla y ver sus instrucciones, alimentos... -> HECHO
-
-- Cuando marco una receta como favorita, hay que recargar la pagina para que se aplique en el frontend. Si marco la receta como favorita pero NO recargo la pagina, en el backend si aparece como favorita pero en el frontend NO. -> High Priority
-
-- Implementar (backend y frontend) la subida de imagen de perfil de usuario ->
-
-- Implementar descarga de Reportes en Excel, PDF o CSV -> HECHO
-
-- En la descarga de informes, implementar mas datos a exportar -> Low priority
-
-- Fixear el error 403 despues de cerrar sesion
-
-- Crear pagina de Alimentos, en los que se puede hacer una busqueda de todos los alimentos para consultarlos, y tambien crearlos.
-
-- Mover navbar solo al index.html para evitar importar el navbar en cada componente
-
-- Validaciones en todos los formularios (login, registro, modales...)
-
-- Boton de mostrar password
-
-- Tests unitarios
