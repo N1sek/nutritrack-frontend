@@ -13,7 +13,6 @@ import {HttpClient, HttpParams} from '@angular/common/http';
   standalone: true,
   imports: [
     CommonModule,
-    NavbarComponent,
     FormsModule,
     BoxComponent,
   ],

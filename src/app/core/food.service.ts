@@ -57,6 +57,15 @@ export class FoodService {
     return this.http.post<FoodResponse>(`${this.baseUrl}/import`, food);
   }
 
+  getMyFoods(): Observable<FoodResponse[]> {
+    return this.http.get<FoodResponse[]>(`${this.baseUrl}/my`);
+  }
+
+  /** Elimina un alimento creado por mí */
+  deleteMyFood(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
   createFood(food: FoodRequest): Observable<FoodResponse> {
     return this.http.post<FoodResponse>(this.baseUrl, food);
   }

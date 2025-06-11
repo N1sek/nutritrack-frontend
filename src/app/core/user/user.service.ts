@@ -31,6 +31,10 @@ export class UserService {
   private profileChangedSubject = new BehaviorSubject<UserProfile | null>(null);
   profileChanged$ = this.profileChangedSubject.asObservable();
 
+  clearProfile() {
+    this.profileChangedSubject.next(null);
+  }
+
   getProfile(): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${environment.apiUrl}/users/me`);
   }
@@ -54,7 +58,7 @@ export class UserService {
           error: (err: HttpErrorResponse) => {
             if (err.status === 401 || err.status === 403) {
               this.auth.logout();
-              this.profileChangedSubject.next(null);
+              this.clearProfile();
             }
           }
         });
@@ -64,7 +68,7 @@ export class UserService {
 
   loadInitialProfile(): void {
     if (!this.auth.isLoggedIn()) {
-      this.profileChangedSubject.next(null);
+      this.clearProfile();
       return;
     }
 
@@ -75,7 +79,7 @@ export class UserService {
       error: (err: HttpErrorResponse) => {
         if (err.status === 401 || err.status === 403) {
           this.auth.logout();
-          this.profileChangedSubject.next(null);
+          this.clearProfile();
         }
       }
     });

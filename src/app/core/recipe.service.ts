@@ -51,6 +51,15 @@ export class RecipeService {
     return this.http.post<Recipe>(this.baseUrl, recipeData);
   }
 
+  getMyRecipes(): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.baseUrl}/my`);
+  }
+
+  /** Elimina una receta creada por mí */
+  deleteMyRecipe(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
   /** Obtiene todas las recetas (paginadas) */
   getAllRecipes(page = 0, size = 20): Observable<PaginatedRecipes> {
     return this.http.get<PaginatedRecipes>(

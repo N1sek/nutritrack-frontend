@@ -1,106 +1,242 @@
 <main class="container-xxl py-5">
   <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+    <div class="col-lg-8">
       <h3 class="mb-4 text-center">⚙️ Ajustes de Perfil</h3>
 
+      <!-- alertas -->
       @if (error) {
         <div class="alert alert-danger">{{ error }}</div>
       }
-
       @if (success) {
         <div class="alert alert-success">{{ success }}</div>
       }
 
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-center mb-3">👤 Información Personal</h5>
+      <!-- pestañas -->
+      <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+          <a class="nav-link" [class.active]="activeTab==='info'" (click)="selectTab('info')">Información</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [class.active]="activeTab==='recipes'" (click)="selectTab('recipes')">Mis recetas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [class.active]="activeTab==='foods'" (click)="selectTab('foods')">Mis alimentos</a>
+        </li>
+      </ul>
 
-          <div class="text-center mb-3">
+      <!-- INFO -->
+      @if (activeTab==='info') {
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title text-center mb-3">👤 Información Personal</h5>
+
+            <div class="text-center mb-3">
+              @if (user) {
+                <img
+                  [src]="user.avatarUrl || 'https://via.placeholder.com/120'"
+                  class="rounded-circle"
+                  style="width:120px;height:120px;object-fit:cover;"
+                />
+              }
+              <input type="file" class="form-control mt-2" (change)="uploadImage($event)" accept="image/*" />
+            </div>
+
             @if (user) {
-              <img [src]="user.avatarUrl || 'https://img.cryptorank.io/coins/arab_cat1706520810607.png'"
-                   class="rounded-circle" style="width: 120px; height: 120px;">
-            }
-            <input type="file" class="form-control mt-2" (change)="uploadImage($event)" accept="image/*">
-          </div>
+              <form (ngSubmit)="saveProfile()">
+                <div class="mb-3">
+                  <label class="form-label">Nombre</label>
+                  <input type="text" class="form-control" [(ngModel)]="user.name" name="name" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Nickname</label>
+                  <input type="text" class="form-control" [(ngModel)]="user.nickname" name="nickname" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Correo Electrónico</label>
+                  <input type="email" class="form-control" [(ngModel)]="user.email" name="email" disabled />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Peso (kg)</label>
+                  <input type="number" class="form-control" [(ngModel)]="user.weight" name="weight" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Altura (cm)</label>
+                  <input type="number" class="form-control" [(ngModel)]="user.height" name="height" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Fecha de nacimiento</label>
+                  <input type="date" class="form-control" [(ngModel)]="user.birthDate" name="birthDate" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Objetivo</label>
+                  <select class="form-select" [(ngModel)]="user.goal" name="goal">
+                    <option value="GAIN">Ganar Masa Muscular</option>
+                    <option value="MAINTAIN">Mantener Peso</option>
+                    <option value="LOSE">Perder Peso</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Nivel de Actividad</label>
+                  <select class="form-select" [(ngModel)]="user.activityLevel" name="activityLevel">
+                    <option value="SEDENTARY">Sedentario</option>
+                    <option value="MODERATE">Moderado</option>
+                    <option value="ACTIVE">Activo</option>
+                  </select>
+                </div>
 
-          @if (user) {
-            <form (ngSubmit)="saveProfile()">
-              <div class="mb-3">
-                <label class="form-label">Nombre</label>
-                <input type="text" class="form-control" [(ngModel)]="user.name" name="name">
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Correo Electrónico</label>
-                <input type="email" class="form-control" [(ngModel)]="user.email" name="email" disabled>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Peso (kg)</label>
-                <input type="number" class="form-control" [(ngModel)]="user.weight" name="weight">
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Altura (cm)</label>
-                <input type="number" class="form-control" [(ngModel)]="user.height" name="height">
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Fecha de nacimiento</label>
-                <input type="date" class="form-control" [(ngModel)]="user.birthDate" name="birthDate">
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Objetivo</label>
-                <select class="form-select" [(ngModel)]="user.goal" name="goal">
-                  <option value="GAIN">Ganar Masa Muscular</option>
-                  <option value="MAINTAIN">Mantener Peso</option>
-                  <option value="LOSE">Perder Peso</option>
-                </select>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Nivel de Actividad</label>
-                <select class="form-select" [(ngModel)]="user.activityLevel" name="activityLevel">
-                  <option value="SEDENTARY">Sedentario</option>
-                  <option value="MODERATE">Moderado</option>
-                  <option value="ACTIVE">Activo</option>
-                </select>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Alergenos</label>
-                <div class="row">
-                  @for (allergen of allergens; track allergen) {
-                    <div class="col-6">
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox"
-                               [id]="'allergen' + allergen.name"
-                               [(ngModel)]="user.allergens[allergen.name]"
-                               [name]="'allergens' + allergen.name">
-                        <label class="form-check-label" [for]="'allergen' + allergen.name">
-                          {{ allergen.icon }} {{ allergen.name }}
-                        </label>
+                <div class="mb-3">
+                  <label class="form-label">Alergenos</label>
+                  <div class="row">
+                    @for (allergen of allergens; track allergen.id) {
+                      <div class="col-6">
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            [id]="'allergen' + allergen.id"
+                            [(ngModel)]="user.allergens[allergen.name]"
+                            [name]="'allergens' + allergen.id"
+                          />
+                          <label class="form-check-label" [for]="'allergen' + allergen.id">
+                            {{ allergen.icon }} {{ allergen.name }}
+                          </label>
+                        </div>
                       </div>
-                    </div>
-                  }
+                    }
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">💾 Guardar Cambios</button>
+              </form>
+            }
+          </div>
+        </div>
+
+        <!-- Cambiar contraseña -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title">🔑 Seguridad</h5>
+            <button class="btn btn-outline-primary w-100 mb-3" (click)="toggleChangePwd()">
+              Cambiar Contraseña
+            </button>
+            @if (showChangePwd) {
+              <form (ngSubmit)="savePassword()">
+                <div class="mb-3">
+                  <label class="form-label">Contraseña actual</label>
+                  <input type="password" class="form-control" [(ngModel)]="oldPassword" name="oldPassword" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Nueva contraseña</label>
+                  <input type="password" class="form-control" [(ngModel)]="newPassword" name="newPassword" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Confirmar nueva contraseña</label>
+                  <input type="password" class="form-control" [(ngModel)]="confirmNewPassword" name="confirmNewPassword" />
+                </div>
+                <button type="submit" class="btn btn-success w-100 mb-2">Actualizar Contraseña</button>
+              </form>
+            }
+            <hr />
+            <button class="btn btn-outline-danger w-100" (click)="deleteAccount()">Eliminar Cuenta</button>
+          </div>
+        </div>
+      }
+
+      <!-- MIS RECETAS -->
+      @if(activeTab==='recipes') {
+        @if (myRecipes.length > 0) {
+        <ul class="list-group mb-4">
+          @for(recipe of myRecipes; track recipe.id) {
+            <li class="list-group-item d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center">
+                <img
+                  [src]="recipe.imageUrl || 'assets/img/no-image-food.png'"
+                  alt="Imagen de {{recipe.name}}"
+                  class="rounded me-3"
+                  style="width:48px; height:48px; object-fit:cover;"
+                />
+                <div>
+                  <strong>{{ recipe.name }}</strong>
+                  <div class="small text-muted">
+                    {{ recipe.calories | number:'1.0-0' }} kcal ·
+                    {{ recipe.protein  | number:'1.1-1' }}g Prot ·
+                    {{ recipe.carbs    | number:'1.1-1' }}g Carb ·
+                    {{ recipe.fat      | number:'1.1-1' }}g Grasa
+                  </div>
                 </div>
               </div>
-
-              <button type="submit" class="btn btn-primary w-100">💾 Guardar Cambios</button>
-            </form>
+              <div class="btn-group btn-group-sm">
+                <button
+                  class="btn btn-outline-secondary"
+                  (click)="viewRecipe(recipe.id)"
+                  title="Ver receta"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button
+                  class="btn btn-outline-danger"
+                  (click)="deleteRecipe(recipe.id)"
+                  title="Eliminar receta"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </li>
           }
-        </div>
-      </div>
+        </ul>
+        }
 
-      <div class="card shadow-sm mt-4">
-        <div class="card-body text-center">
-          <h5 class="card-title">🔑 Seguridad</h5>
-          <button class="btn btn-outline-primary w-100" (click)="changePassword()">Cambiar Contraseña</button>
-          <hr>
-          <button class="btn btn-outline-danger w-100" (click)="deleteAccount()">Eliminar Cuenta</button>
-        </div>
-      </div>
+        @if (myRecipes.length === 0) {
+          <div class="text-center py-5 text-muted">
+            <p>No has creado ninguna receta aún.</p>
+            <a routerLink="/recipes" class="btn btn-sm btn-primary">
+              <i class="bi bi-plus-lg me-1"></i> Crear mi primera receta
+            </a>
+          </div>
+        }
+      }
+
+
+      <!-- MIS ALIMENTOS -->
+      @if(activeTab==='foods') {
+        @if (myFoods.length > 0) {
+        <ul class="list-group">
+          @for(food of myFoods; track food.id) {
+            <li class="list-group-item d-flex align-items-center justify-content-between">
+              <div>
+                <strong>{{ food.name }}</strong>
+                <div class="small text-muted">
+                  {{ food.calories | number:'1.0-0' }} kcal ·
+                  {{ food.protein  | number:'1.1-1' }}g Prot ·
+                  {{ food.carbs    | number:'1.1-1' }}g Carb ·
+                  {{ food.fat      | number:'1.1-1' }}g Grasa
+                </div>
+              </div>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="deleteFood(food.id)"
+                title="Eliminar alimento"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </li>
+          }
+        </ul>
+        }
+
+        @if (myFoods.length === 0) {
+          <div class="text-center py-5 text-muted">
+            <p>No has agregado ningún alimento propio aún.</p>
+            <a routerLink="/foods" class="btn btn-sm btn-primary">
+              <i class="bi bi-plus-lg me-1"></i> Agregar mi primer alimento
+            </a>
+          </div>
+        }
+      }
+
+
     </div>
   </div>
+
+  <app-recipe-detail-modal #recipeDetailModal></app-recipe-detail-modal>
 </main>

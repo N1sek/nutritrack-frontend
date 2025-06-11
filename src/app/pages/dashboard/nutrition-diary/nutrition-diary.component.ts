@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { formatDate } from '@angular/common';
-import { BoxComponent } from '../../../shared/components/box/box.component';
-import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
-import { SearchFoodModalComponent } from '../../../shared/components/search-food-modal/search-food-modal.component';
-import { DailyLogService, DailyLogResponse } from '../../../core/daily-log.service';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { CommonModule }                         from '@angular/common';
+import { formatDate }                           from '@angular/common';
+import { FormsModule }                          from '@angular/forms';
+import { BoxComponent }                         from '../../../shared/components/box/box.component';
+import { SearchFoodModalComponent }             from '../../../shared/components/search-food-modal/search-food-modal.component';
+import { DailyLogService, DailyLogResponse, DailyLogEntryResponse } from '../../../core/daily-log.service';
 
 @Component({
   selector: 'app-nutrition-diary',
@@ -14,8 +13,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     FormsModule,
     SearchFoodModalComponent,
-    BoxComponent,
-    NavbarComponent
+    BoxComponent
   ],
   templateUrl: './nutrition-diary.component.html',
   styleUrls: ['./nutrition-diary.component.scss']
@@ -23,14 +21,14 @@ import { FormsModule } from '@angular/forms';
 export class NutritionDiaryComponent implements OnInit {
   @ViewChild(SearchFoodModalComponent) searchModal!: SearchFoodModalComponent;
 
-  currentDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
-  entries: any[] = [];
+  currentDate   = formatDate(new Date(), 'yyyy-MM-dd', 'en');
+  dailyLog: DailyLogResponse | null = null;
+  entries: DailyLogEntryResponse[]  = [];
   meals = ['BREAKFAST', 'LUNCH', 'SNACK', 'DINNER'];
   loading = false;
-
   fastingHours: number | null = null;
 
-  constructor(private dailyLogService: DailyLogService) {}
+  private dailyLogService = inject(DailyLogService);
 
   ngOnInit(): void {
     this.fetchDiary();
@@ -39,15 +37,17 @@ export class NutritionDiaryComponent implements OnInit {
   fetchDiary(): void {
     this.loading = true;
     this.dailyLogService.getDiary(this.currentDate).subscribe({
-      next: (res: DailyLogResponse) => {
-        this.entries = res.entries || [];
-        this.fastingHours = res.fastingHours ?? 0;
-        this.loading = false;
+      next: res => {
+        this.dailyLog     = res;
+        this.entries      = res.entries  || [];
+        this.fastingHours = res.fastingHours;
+        this.loading      = false;
       },
       error: () => {
-        this.entries = [];
-        this.fastingHours = 0;
-        this.loading = false;
+        this.dailyLog     = null;
+        this.entries      = [];
+        this.fastingHours = null;
+        this.loading      = false;
       }
     });
   }
@@ -62,41 +62,41 @@ export class NutritionDiaryComponent implements OnInit {
       fastingHours: this.fastingHours,
       entries: [entry]
     };
-
     this.dailyLogService.saveOrUpdateDiary(body).subscribe({
       next: () => this.fetchDiary(),
-      error: (err) => console.error('Error guardando entrada:', err)
+      error: err => console.error('Error guardando entrada:', err)
     });
   }
 
   deleteEntry(id: number): void {
     this.dailyLogService.deleteEntry(id).subscribe({
       next: () => this.fetchDiary(),
-      error: (err) => console.error('Error borrando entrada:', err)
+      error: err => console.error('Error borrando entrada:', err)
     });
   }
 
-  getEntriesByMeal(meal: string): any[] {
+  getEntriesByMeal(meal: string): DailyLogEntryResponse[] {
     return this.entries.filter(e => e.mealType === meal);
   }
 
-  calcular(entry: any, prop: string): number {
+  calcular(entry: any, prop: 'calories'|'protein'|'carbs'|'fat'): number {
+    // Si el mapper ya volcó customNutrition, lo usamos directamente
+    if (entry[prop] != null) {
+      return entry[prop];
+    }
+    // Si no, calculamos a partir de food/recipe
     const item = entry.food || entry.recipe;
-    return Math.round((item?.[prop] || 0) * (entry.quantity / 100));
+    const q = entry.quantity / 100;
+    return Math.round((item?.[prop] || 0) * q * 100) / 100;
   }
 
   traducirMealType(meal: string): string {
     switch (meal) {
-      case 'BREAKFAST':
-        return 'Desayuno';
-      case 'LUNCH':
-        return 'Comida';
-      case 'DINNER':
-        return 'Cena';
-      case 'SNACK':
-        return 'Almuerzo';
-      default:
-        return meal;
+      case 'BREAKFAST': return 'Desayuno';
+      case 'LUNCH':     return 'Comida';
+      case 'DINNER':    return 'Cena';
+      case 'SNACK':     return 'Snack';
+      default:          return meal;
     }
   }
 
@@ -106,29 +106,10 @@ export class NutritionDiaryComponent implements OnInit {
       fastingHours: this.fastingHours,
       entries: []
     };
-
     this.dailyLogService.saveOrUpdateDiary(body).subscribe({
       next: () => this.fetchDiary(),
-      error: (err) => console.error('Error guardando horas de ayuno:', err)
+      error: err => console.error('Error guardando horas de ayuno:', err)
     });
-  }
-
-  get total() {
-    return this.entries.reduce(
-      (acc, e) => {
-        const item = e.food || e.recipe;
-        if (!item) {
-          return acc;
-        }
-        const q = (e.quantity || 0) / 100;
-        acc.calories += (item.calories || 0) * q;
-        acc.protein += (item.protein || 0) * q;
-        acc.carbs += (item.carbs || 0) * q;
-        acc.fat += (item.fat || 0) * q;
-        return acc;
-      },
-      { calories: 0, protein: 0, carbs: 0, fat: 0 }
-    );
   }
 
   handleImageError(entry: any): void {

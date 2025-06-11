@@ -1,56 +1,59 @@
 // src/app/pages/auth/login/login.component.ts
-import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../../../core/auth/auth.service';
-import { UserService, UserProfile } from '../../../core/user/user.service';
-import {NavbarComponent} from '../../../shared/components/navbar/navbar.component';
-import {FormsModule} from '@angular/forms';
+import { Component, inject }       from '@angular/core';
+import { Router }                  from '@angular/router';
+import { FormsModule }             from '@angular/forms';
+import { AuthService }             from '../../../core/auth/auth.service';
+import { UserService, UserProfile }from '../../../core/user/user.service';
+import { filter, take }            from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  templateUrl: './login.component.html',
   imports: [
-    NavbarComponent,
     FormsModule
   ],
+  templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   private authService = inject(AuthService);
   private userService = inject(UserService);
-  private router = inject(Router);
+  private router      = inject(Router);
 
-  email = '';
+  email    = '';
   password = '';
   error: string | null = null;
   loading = false;
 
   login() {
     if (!this.email || !this.password) {
-      this.showError('Por favor, completa todos los campos.');
-      return;
+      return this.showError('Por favor, completa todos los campos.');
     }
 
     this.loading = true;
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
-        // Una vez tenemos el token, pedimos el perfil
-        this.userService.getProfile().subscribe({
-          next: (user: UserProfile) => {
-            this.loading = false;
-            if (user.role === 'ADMIN') {
-              this.router.navigate(['/admin/users']);
-            } else {
+        this.userService.loadInitialProfile();
+
+        this.userService.profileChanged$
+          .pipe(
+            filter((u): u is UserProfile => u !== null),
+            take(1)
+          )
+          .subscribe({
+            next: user => {
+              this.loading = false;
+              if (user.role === 'ADMIN') {
+                this.router.navigate(['/admin/users']);
+              } else {
+                this.router.navigate(['/dashboard']);
+              }
+            },
+            error: () => {
+              this.loading = false;
               this.router.navigate(['/dashboard']);
             }
-          },
-          error: () => {
-            this.loading = false;
-            // Si falla al cargar perfil, al menos vamos al dashboard
-            this.router.navigate(['/dashboard']);
-          }
-        });
+          });
       },
       error: err => {
         this.loading = false;

@@ -27,6 +27,14 @@ export interface DailyLogEntryResponse {
     fat: number;
     // …
   };
+
+  calories:    number;
+  protein:     number;
+  carbs:       number;
+  fat:         number;
+  sugar?:      number;
+  salt?:       number;
+  saturatedFat?: number;
 }
 
 

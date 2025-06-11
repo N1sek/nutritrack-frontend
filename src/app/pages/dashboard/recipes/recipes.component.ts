@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, ViewChild } from '@angular/core';
+import {Component, HostListener, inject, OnInit, ViewChild} from '@angular/core';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { RecipeCardComponent } from './components/recipe-card/recipe-card.component';
 import { RecipeFiltersComponent } from './components/recipe-filters/recipe-filters.component';
@@ -20,9 +20,10 @@ import {RecipeDetailModalComponent} from '../../../shared/components/recipe-deta
   ],
   templateUrl: './recipes.component.html'
 })
-export class RecipesComponent {
+export class RecipesComponent implements OnInit {
   @ViewChild(CreateRecipeModalComponent) createModal!: CreateRecipeModalComponent;
   private recipeService = inject(RecipeService);
+
 
   isGridView: boolean = window.innerWidth >= 768;
   recipes: any[] = [];

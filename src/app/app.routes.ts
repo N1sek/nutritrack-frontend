@@ -11,6 +11,7 @@ import { UserComponent} from './pages/dashboard/user/user.component';
 import {UsersComponent} from './pages/admin/users/users.component';
 import {adminGuard} from './core/auth/admin.guard';
 import {AdminFoodsComponent} from './pages/admin/admin-foods/admin-foods.component';
+import {FoodsComponent} from './pages/dashboard/foods/foods.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -18,8 +19,9 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'nutrition-diary', component: NutritionDiaryComponent, canActivate: [authGuard] },
-  { path: 'recetas', component: RecipesComponent, canActivate: [authGuard] },
+  { path: 'recipes', component: RecipesComponent, canActivate: [authGuard] },
   { path: 'reports', component: ReportsComponent, canActivate: [authGuard] },
+  { path: 'foods', component: FoodsComponent, canActivate: [authGuard] },
   { path: 'user', component: UserComponent, canActivate: [authGuard] },
 
   { path: 'admin/users', component: UsersComponent, canActivate: [authGuard, adminGuard] },

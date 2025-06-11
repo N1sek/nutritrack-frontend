@@ -48,7 +48,7 @@
 
                 <div class="flex-grow-1">
                   <h6 class="mb-1">
-                    {{ entry.food?.name || entry.recipe?.name }}
+                    {{ entry.food?.name || entry.recipe?.name || '[Receta eliminada]' }}
                   </h6>
                   <small class="text-muted">
                     Cantidad: {{ entry.quantity }} g
@@ -86,16 +86,16 @@
           <h5 class="mb-2">📊 Totales del día</h5>
           <div class="d-flex flex-wrap justify-content-center gap-3">
             <span class="badge bg-success-subtle text-dark border">
-              🔥 {{ total.calories | number:'1.0-2' }} kcal
+              🔥 {{ dailyLog?.totalCalories | number:'1.0-2' }} kcal
             </span>
             <span class="badge bg-success-subtle text-dark border">
-              🥩 {{ total.protein | number:'1.0-2' }}g Proteínas
+              🥩 {{ dailyLog?.totalProtein | number:'1.0-2' }}g Proteínas
             </span>
             <span class="badge bg-success-subtle text-dark border">
-              🍞 {{ total.carbs | number:'1.0-2' }}g Carbohidratos
+              🍞 {{ dailyLog?.totalCarbs | number:'1.0-2' }}g Carbohidratos
             </span>
             <span class="badge bg-success-subtle text-dark border">
-              🧈 {{ total.fat | number:'1.0-2' }}g Grasas
+              🧈 {{ dailyLog?.totalFat | number:'1.0-2' }}g Grasas
             </span>
           </div>
         </div>

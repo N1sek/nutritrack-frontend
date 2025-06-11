@@ -64,20 +64,16 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.fastingHours = res.fastingHours || 0;
 
-        this.recentEntries = (res.entries || []).map(entry => {
-          const item = entry.food || entry.recipe;
-          const qty = entry.quantity || 0;
-          return {
-            id: entry.id,
-            name: item?.name || 'Desconocido',
-            image: item?.imageUrl || '',
-            quantity: `${qty}g`,
-            calories: Math.round((item?.calories || 0) * qty / 100),
-            protein: Math.round((item?.protein || 0) * qty / 100),
-            carbs: Math.round((item?.carbs || 0) * qty / 100),
-            fat: Math.round((item?.fat || 0) * qty / 100)
-          };
-        });
+        this.recentEntries = (res.entries || []).map(entry => ({
+          id:       entry.id,
+          name:     entry.food?.name ?? entry.recipe?.name ?? 'Receta eliminada',
+          image:    entry.food?.imageUrl  ?? entry.recipe?.imageUrl  ?? 'https://placehold.co/50x50',
+          quantity: `${entry.quantity} g`,
+          calories: Math.round(entry.calories),
+          protein:  Math.round(entry.protein),
+          carbs:    Math.round(entry.carbs),
+          fat:      Math.round(entry.fat),
+        }));
       },
       error: () => {
         this.caloriesConsumed = 0;

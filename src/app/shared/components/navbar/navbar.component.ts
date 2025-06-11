@@ -47,6 +47,7 @@ export class NavbarComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+    this.userService.clearProfile();
   }
 
   isLoggedIn(): boolean {
