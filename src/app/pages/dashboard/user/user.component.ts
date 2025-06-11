@@ -9,8 +9,7 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
   imports: [
-    FormsModule,
-    NavbarComponent
+    FormsModule
   ]
 })
 export class UserComponent implements OnInit {

@@ -13,6 +13,7 @@
 - Validación en registro de usuarios (login/registro) [HECHO]
 - Corregir la recarga tras marcar receta como favorita para reflejar el cambio en frontend [HECHO]
 - Añadir botón de mostrar/ocultar contraseña en formularios [HECHO]
+- Mover el navbar solo al index.html para no importarlo en cada componente [HECHO]
 
 [MEJORAS / BAJA PRIORIDAD]
 ------------------------------------------------------
@@ -22,10 +23,11 @@
 - Validar en “tiempo real” si existe un email o nickname [Low Priority / Mejora]
 - Desarrollar tests unitarios para asegurar la calidad del código
 
+
 [PRIORIDAD ALTA]
 ------------------------------------------------------
 - Apartados en el perfil de usuario: “Mis recetas”, “Mis alimentos”…
 - Crear página de Alimentos con búsqueda y creación de ítems
-- Mover el navbar solo al index.html para no importarlo en cada componente
-- Implementar validaciones en todos los formularios (login, registro, modales…)
+- CRUD Admin de Gestion de Recetas, parecido al CRUD de alimentos
+- Implementar validaciones y errores en todos los formularios (login, registro, modales…) -> HECHO EN REGISTRO
 
