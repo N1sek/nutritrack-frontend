@@ -12,6 +12,7 @@ import {UsersComponent} from './pages/admin/users/users.component';
 import {adminGuard} from './core/auth/admin.guard';
 import {AdminFoodsComponent} from './pages/admin/admin-foods/admin-foods.component';
 import {FoodsComponent} from './pages/dashboard/foods/foods.component';
+import {AdminRecipesComponent} from './pages/admin/admin-recipes/admin-recipes.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -26,5 +27,6 @@ export const routes: Routes = [
 
   { path: 'admin/users', component: UsersComponent, canActivate: [authGuard, adminGuard] },
   { path: 'admin/foods', component: AdminFoodsComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'admin/recipes', component: AdminRecipesComponent, canActivate: [authGuard, adminGuard] },
   { path: '**', redirectTo: '' }
 ];

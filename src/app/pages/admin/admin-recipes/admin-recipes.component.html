@@ -1,0 +1,235 @@
+<main class="container-xxl py-5">
+  <h3 class="mb-4 text-center">📖 Gestión de Recetas</h3>
+
+  <!-- búsqueda + botón crear -->
+  <div class="row justify-content-center mb-4">
+    <div class="col-md-8 d-flex gap-2">
+      <input type="text"
+             class="form-control"
+             placeholder="Buscar recetas..."
+             [(ngModel)]="searchTerm"
+             (input)="loadRecipes()" />
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center my-4">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <div *ngIf="!loading && filteredContent.length" class="row justify-content-center">
+    <div class="col-md-8">
+      <ul class="list-group">
+        <li *ngFor="let r of filteredContent; let i = index"
+            class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ r.name }}</strong>
+            <small class="text-muted">({{ r.calories }} kcal)</small>
+          </div>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-secondary"
+                    (click)="openFormModal(r)"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-outline-danger"
+                    (click)="confirmDelete(r)"><i class="bi bi-trash"></i></button>
+          </div>
+        </li>
+      </ul>
+
+      <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 0">
+            <button class="page-link" (click)="goToPage(currentPage-1)">«</button>
+          </li>
+          <li class="page-item"
+              *ngFor="let p of pageNumbers"
+              [class.active]="p===currentPage">
+            <button class="page-link" (click)="goToPage(p)">{{ p+1 }}</button>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage+1 >= totalPages">
+            <button class="page-link" (click)="goToPage(currentPage+1)">»</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !filteredContent.length" class="text-center text-muted my-4">
+    No hay recetas.
+  </div>
+
+  <div #formModal class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <form class="modal-content" (ngSubmit)="saveRecipe()">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editingRecipe ? 'Editar' : 'Crear' }} receta</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nombre *</label>
+            <input type="text" class="form-control" required
+                   [(ngModel)]="recipeFormData.name" name="name" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control"
+                      [(ngModel)]="recipeFormData.description"
+                      name="description"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Instrucciones</label>
+            <textarea class="form-control"
+                      [(ngModel)]="recipeFormData.instructions"
+                      name="instructions"></textarea>
+          </div>
+
+
+          <div class="mb-4">
+            <label class="form-label">Ingredientes</label>
+
+            <!-- Ingredientes actuales -->
+            <ul class="list-group mb-2">
+              <li *ngFor="let ing of recipeFormData.ingredients; let i = index" class="list-group-item d-flex align-items-center justify-content-between">
+                <div>
+                  <strong>{{ ing.food?.name || 'Sin alimento' }}</strong>
+                  <span class="text-muted small ms-2">
+          {{ ing.quantity }} {{ ing.unit || 'g' }}
+        </span>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <input type="number"
+                         class="form-control form-control-sm w-auto"
+                         [(ngModel)]="ing.quantity"
+                         min="1"
+                         style="max-width:80px;"
+                         name="ingredientQuantity{{i}}">
+                  <select class="form-select form-select-sm w-auto"
+                          [(ngModel)]="ing.unit"
+                          style="max-width:70px;"
+                          name="ingredientUnit{{i}}">
+                    <option value="g">g</option>
+                    <option value="ml">ml</option>
+                  </select>
+                  <button class="btn btn-outline-danger btn-sm" (click)="removeIngredient(i)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Agregar ingrediente -->
+            <div class="input-group input-group-sm mb-2">
+              <input type="text"
+                     class="form-control"
+                     [(ngModel)]="ingredientSearch"
+                     placeholder="Buscar alimento..."
+                     (input)="onIngredientSearch()"
+                     name="ingredientSearch">
+              <input type="number"
+                     class="form-control"
+                     [(ngModel)]="newIngredientQuantity"
+                     min="1"
+                     placeholder="Cantidad"
+                     style="max-width:90px;"
+                     name="newIngredientQuantity">
+              <select class="form-select"
+                      [(ngModel)]="newIngredientUnit"
+                      style="max-width:70px;"
+                      name="newIngredientUnit">
+                <option value="g">g</option>
+                <option value="ml">ml</option>
+              </select>
+              <button class="btn btn-success"
+                      (click)="addIngredient()"
+                      [disabled]="!selectedIngredient || !newIngredientQuantity">Añadir</button>
+            </div>
+
+            <!-- Resultados búsqueda alimento -->
+            <div *ngIf="ingredientResults.length > 0" class="list-group position-absolute w-50" style="z-index:999">
+              <button type="button" class="list-group-item list-group-item-action"
+                      *ngFor="let food of ingredientResults"
+                      (click)="selectIngredient(food)">
+                {{ food.name }}
+              </button>
+            </div>
+          </div>
+
+
+          <div class="mb-3">
+            <label class="form-label">Tipo de comida</label>
+            <select class="form-select"
+                    [(ngModel)]="recipeFormData.mealType"
+                    name="mealType">
+              <option [ngValue]="undefined">— Seleccionar —</option>
+              <option *ngFor="let t of ['BREAKFAST','LUNCH','DINNER','SNACK']"
+                      [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Calorías</label>
+              <input type="number" class="form-control"
+                     [(ngModel)]="recipeFormData.calories" name="calories" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Proteínas</label>
+              <input type="number" class="form-control"
+                     [(ngModel)]="recipeFormData.protein" name="protein" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Carbs</label>
+              <input type="number" class="form-control"
+                     [(ngModel)]="recipeFormData.carbs" name="carbs" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Grasas</label>
+              <input type="number" class="form-control"
+                     [(ngModel)]="recipeFormData.fat" name="fat" />
+            </div>
+          </div>
+          <div class="mb-3 mt-3">
+            <label class="form-label">Imagen</label>
+            <input type="file" accept="image/*" class="form-control"
+                   (change)="onFileSelected($event)" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+                  data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            {{ editingRecipe ? 'Guardar cambios' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div #confirmModal class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar receta</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          ¿Seguro que deseas eliminar
+          <strong>{{ selectedRecipeToDelete?.name }}</strong>?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+                  data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger"
+                  (click)="onDeleteConfirmed()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div #toast class="toast align-items-center text-bg-primary border-0 position-fixed bottom-0 end-0 m-3"
+       role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">{{ toastMessage }}</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  </div>
+</main>

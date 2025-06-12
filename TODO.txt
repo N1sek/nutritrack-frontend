@@ -15,6 +15,7 @@
 - Añadir botón de mostrar/ocultar contraseña en formularios [HECHO]
 - Mover el navbar solo al index.html para no importarlo en cada componente [HECHO]
 - Apartados en el perfil de usuario: "Mis recetas", "Mis alimentos"… [HECHO]
+- Crear página de Alimentos con búsqueda y creación de ítems [HECHO]
 
 [MEJORAS / BAJA PRIORIDAD]
 ------------------------------------------------------
@@ -27,7 +28,6 @@
 
 [PRIORIDAD ALTA]
 ------------------------------------------------------
-- Crear página de Alimentos con búsqueda y creación de ítems
 - CRUD Admin de Gestion de Recetas, parecido al CRUD de alimentos
 - Implementar validaciones y errores en todos los formularios (login, registro, modales…) -> HECHO EN REGISTRO
 

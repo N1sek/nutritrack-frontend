@@ -15,6 +15,7 @@ export interface Recipe {
   protein: number;
   fat: number;
   carbs: number;
+  mealType?: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK';
   isPublic?: boolean;
   ingredients?: any[];
   createdBy?: string;
@@ -34,6 +35,7 @@ export interface PaginatedRecipes {
 export class RecipeService {
 
   private readonly baseUrl = `${environment.apiUrl}/recipes`;
+  private readonly adminBaseUrl = `${environment.apiUrl}/admin/recipes`;
 
   constructor(private http: HttpClient) {}
 
@@ -87,5 +89,30 @@ export class RecipeService {
   /** Marca o desmarca una receta como favorita */
   toggleFavorite(id: number): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${id}/favorite`, {});
+  }
+
+  /** Lista todas las recetas (ADMIN) */
+  listAllAdmin(): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(this.adminBaseUrl);
+  }
+
+  /** Obtiene una receta por ID (ADMIN) */
+  getOneAdmin(id: number): Observable<Recipe> {
+    return this.http.get<Recipe>(`${this.adminBaseUrl}/${id}`);
+  }
+
+  /** Crea una receta (ADMIN) */
+  createAdmin(recipeData: any): Observable<Recipe> {
+    return this.http.post<Recipe>(this.adminBaseUrl, recipeData);
+  }
+
+  /** Actualiza una receta (ADMIN) */
+  updateAdmin(id: number, recipeData: any): Observable<Recipe> {
+    return this.http.put<Recipe>(`${this.adminBaseUrl}/${id}`, recipeData);
+  }
+
+  /** Elimina una receta (ADMIN) */
+  deleteAdmin(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.adminBaseUrl}/${id}`);
   }
 }

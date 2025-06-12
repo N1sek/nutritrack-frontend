@@ -20,11 +20,12 @@ export class FoodsComponent implements OnInit {
   searchQuery    = '';
   loading        = false;
 
+  private tempExternalId = -1;
+
   localResults:    FoodResponse[] = [];
   externalResults: FoodResponse[] = [];
   mergedResults:   FoodResponse[] = [];
 
-  // Inline crear alimento
   showCreateForm = false;
   newFood = {
     name:     '',
@@ -36,11 +37,9 @@ export class FoodsComponent implements OnInit {
   selectedFile: File | null = null;
   imagePreview: string | null = null;
 
-  // Para añadir al diario
   tempQuantity: Record<number, number>   = {};
   tempMealType: Record<number, MealType> = {};
 
-  // Fecha para añadir al diario automáticamente
   currentDate = new Date().toISOString().slice(0,10);
 
   ngOnInit() {}
@@ -65,25 +64,37 @@ export class FoodsComponent implements OnInit {
   }
 
   private mergeAndInit() {
-    const seen = new Set<string>();
-    const all: FoodResponse[] = [];
+    const byName = new Map<string, FoodResponse>();
+    let tempId = -1;
 
     for (const f of [...this.localResults, ...this.externalResults]) {
-      const key = `${f.name.toLowerCase()}|${f.imageUrl||''}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        all.push(f);
-        // init temporales si faltan
-        if (this.tempQuantity[f.id] == null)   this.tempQuantity[f.id] = 100;
-        if (this.tempMealType[f.id] == null)   this.tempMealType[f.id] = 'LUNCH';
+      const nameKey = f.name.trim().toLowerCase();
+      if (!byName.has(nameKey)) {
+        const clone = { ...f };
+        if (clone.id == null) clone.id = tempId--;
+        byName.set(nameKey, clone);
+      } else {
+        const existing = byName.get(nameKey)!;
+        if (!existing.imageUrl && f.imageUrl) {
+          const clone = { ...f };
+          clone.id = existing.id;
+          byName.set(nameKey, clone);
+        }
       }
     }
 
-    this.mergedResults = all;
+    this.mergedResults = Array.from(byName.values());
     this.loading       = false;
+
+    for (const food of this.mergedResults) {
+      const id = food.id!;
+      if (this.tempQuantity[id] == null) this.tempQuantity[id] = 100;
+      if (this.tempMealType[id] == null) this.tempMealType[id] = 'LUNCH';
+    }
   }
 
-  // Toggle inline crear
+
+
   toggleCreateForm() {
     this.showCreateForm = !this.showCreateForm;
     if (!this.showCreateForm) this.resetForm();
@@ -99,7 +110,6 @@ export class FoodsComponent implements OnInit {
     this.imagePreview = null;
   }
 
-  // Preview imagen
   onFileSelected(evt: Event) {
     const inp = evt.target as HTMLInputElement;
     if (!inp.files?.length) {
@@ -113,11 +123,9 @@ export class FoodsComponent implements OnInit {
     reader.readAsDataURL(this.selectedFile);
   }
 
-  // Llamada al backend para crear
   createFood() {
     this.foodService.createFood(this.newFood).subscribe({
       next: created => {
-        // insert al top o refresca búsqueda
         if (this.searchQuery.trim()) {
           this.onSearch();
         } else {
@@ -129,22 +137,76 @@ export class FoodsComponent implements OnInit {
     });
   }
 
-  // Añadir al diario
+
   addToDiary(food: FoodResponse) {
-    const entry = {
-      foodId:   food.id,
-      quantity: this.tempQuantity[food.id],
-      mealType: this.tempMealType[food.id]
+    const performAdd = (id: number) => {
+      const entry = {
+        foodId:   id,
+        quantity: this.tempQuantity[id],
+        mealType: this.tempMealType[id]
+      };
+      this.dailyLogService.saveOrUpdateDiary({
+        date: this.currentDate,
+        fastingHours: null,
+        entries: [entry]
+      }).subscribe({
+        next: () => { this.showToast('📝 Se ha añadido al diario', 'success'); },
+        error: err => { this.showToast('⚠️ No se pudo añadir al diario', 'danger'); }
+      });
     };
-    this.dailyLogService.saveOrUpdateDiary({
-      date: this.currentDate,
-      fastingHours: null,
-      entries: [entry]
-    }).subscribe({
-      next: () => {
-        // opcional: toast de éxito
-      },
-      error: err => console.error('Error añadiendo al diario:', err)
-    });
+
+    if (food.id! < 0) {
+      const payload = {
+        name: food.name,
+        calories: food.calories,
+        protein: food.protein,
+        carbs: food.carbs,
+        fat: food.fat,
+        imageUrl: food.imageUrl
+      };
+      this.foodService.createFood(payload).subscribe({
+        next: created => {
+          const oldId = food.id!;
+          food.id = created.id;
+
+          this.tempQuantity[created.id] = this.tempQuantity[oldId];
+          this.tempMealType[created.id] = this.tempMealType[oldId];
+          delete this.tempQuantity[oldId];
+          delete this.tempMealType[oldId];
+
+          this.mergedResults = this.mergedResults.map(item =>
+            item === food ? { ...item, id: created.id } : item
+          );
+          performAdd(created.id);
+        },
+        error: err => {
+          this.showToast('⚠️ No se pudo crear el alimento', 'danger');
+        }
+      });
+    } else {
+      performAdd(food.id!);
+    }
+  }
+
+  private showToast(message: string, variant: 'success' | 'danger' = 'success') {
+    const toastEl = document.createElement('div');
+    toastEl.className = `toast align-items-center text-bg-${variant} border-0 position-fixed bottom-0 end-0 m-3`;
+    toastEl.setAttribute('role', 'alert');
+    toastEl.setAttribute('aria-live', 'assertive');
+    toastEl.setAttribute('aria-atomic', 'true');
+    toastEl.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body">${message}</div>
+        <button type="button"
+                class="btn-close btn-close-white me-2 m-auto"
+                data-bs-dismiss="toast"
+                aria-label="Cerrar"></button>
+      </div>
+    `;
+    document.body.appendChild(toastEl);
+    (window as any).bootstrap.Toast
+      .getOrCreateInstance(toastEl)
+      .show();
+    toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
   }
 }

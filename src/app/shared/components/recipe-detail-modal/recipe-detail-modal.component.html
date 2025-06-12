@@ -2,16 +2,12 @@
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content rounded-4">
 
-      <!-- CABECERA -->
       <div class="modal-header">
         <h5 class="modal-title">{{ recipe?.name }}</h5>
         <button type="button" class="btn-close" (click)="closeModal()" aria-label="Cerrar"></button>
       </div>
-
-      <!-- CUERPO -->
       <div class="modal-body">
 
-        <!-- Imagen grande -->
         @if (recipe?.imageUrl) {
           <div class="text-center mb-4">
             <img
@@ -23,18 +19,15 @@
           </div>
         }
 
-        <!-- Descripción -->
         @if (recipe?.description) {
           <p class="mb-3">{{ recipe?.description }}</p>
         }
 
-        <!-- Instrucciones -->
         @if (recipe?.instructions) {
           <h6 class="mb-2">📋 Instrucciones</h6>
           <pre class="mb-4" style="white-space: pre-wrap;">{{ recipe?.instructions }}</pre>
         }
 
-        <!-- Ingredientes -->
         <h6 class="mb-2">🍽️ Ingredientes</h6>
         <ul class="list-group mb-4">
           @for (ing of recipe?.ingredients || []; track ing.food.id) {
@@ -52,10 +45,8 @@
           }
         </ul>
 
-        <!-- Separador antes de la acción -->
         <hr class="my-4">
 
-        <!-- Selección de tipo de comida y cantidad + botón -->
         <div class="row align-items-center gx-3">
           <div class="col-md-5">
             <label class="form-label small text-muted">Tipo de comida</label>
@@ -85,7 +76,6 @@
           </div>
         </div>
 
-        <!-- Totales al lado o debajo, de forma discreta -->
         <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
           <span class="badge bg-primary-subtle text-dark border">🔥 {{ recipe?.calories | number:'1.0-0' }} kcal</span>
           <span class="badge bg-success-subtle text-dark border">🥩 {{ recipe?.protein  | number:'1.0-0' }} g</span>
@@ -93,7 +83,6 @@
           <span class="badge bg-danger-subtle text-dark border">🧈 {{ recipe?.fat      | number:'1.0-0' }} g</span>
         </div>
 
-        <!-- Meta datos -->
         <div class="text-muted small mt-4">
           @if(recipe?.createdBy) { <div>🧑‍🍳 Creada por: {{ recipe?.createdBy }}</div> }
           @if(recipe?.createdAt)  { <div>📅 Fecha: {{ recipe?.createdAt | date:'medium' }}</div> }
@@ -102,7 +91,6 @@
 
       </div>
 
-      <!-- PIE -->
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-sm" (click)="closeModal()">Cerrar</button>
       </div>
