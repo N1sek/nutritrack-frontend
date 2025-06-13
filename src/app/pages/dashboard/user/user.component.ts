@@ -99,6 +99,7 @@ export class UserComponent implements OnInit {
     this.userService.updateProfile(payload).subscribe({
       next: () => {
         this.success = 'Perfil actualizado correctamente.';
+        this.userService.loadInitialProfile();
         setTimeout(() => this.success = null, 4000);
       },
       error: () => {

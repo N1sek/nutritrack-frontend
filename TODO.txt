@@ -24,7 +24,8 @@
 - En la descarga de informes, agregar más datos a exportar [Low Priority]
 - Validar en “tiempo real” si existe un email o nickname [Low Priority / Mejora]
 - Desarrollar tests unitarios para asegurar la calidad del código
-
+- Backend custom error tamaño imagen excedido y mostrar como toast en frontend
+- Toast al guardar cambios en user
 
 [PRIORIDAD ALTA]
 ------------------------------------------------------

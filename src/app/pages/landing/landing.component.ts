@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
 import {NgOptimizedImage} from '@angular/common';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {NavbarComponent} from '../../shared/components/navbar/navbar.component';
+import {FooterComponent} from '../../shared/components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [
+    RouterLink,
+    FooterComponent
+  ],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
   standalone: true
