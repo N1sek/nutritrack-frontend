@@ -56,7 +56,6 @@ export class RecipeFiltersComponent {
     this.isMobile = window.innerWidth < 768;
   }
 
-  // Aplica los filtros en escritorio automaticamente y en movil solo al presionar el boton de Aplicar
   applyFilters() {
 
     if (!this.isMobile) {
