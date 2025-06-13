@@ -26,7 +26,6 @@ interface Allergen {
     CommonModule,
     NgIf,
     ReactiveFormsModule,
-    NavbarComponent,
     StepperComponent
   ],
   templateUrl: './register.component.html',
@@ -141,8 +140,8 @@ export class RegisterComponent implements OnInit {
 
     this.auth.register(payload).subscribe({
       next: () => {
-        this.showToast('Registro exitoso. Ya puedes iniciar sesión.', 'success');
-        setTimeout(() => this.router.navigate(['/login']), 1000);
+        this.showToast('Registro exitoso.', 'success');
+        setTimeout(() => this.router.navigate(['/dashboard']), 1000);
       },
       error: err => {
         this.showToast(err.error?.message || 'Ocurrió un error al registrar.', 'danger');
