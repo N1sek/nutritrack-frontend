@@ -164,7 +164,7 @@ export class FoodsComponent implements OnInit {
         fat: food.fat,
         imageUrl: food.imageUrl
       };
-      this.foodService.createFood(payload).subscribe({
+      this.foodService.importFood(payload).subscribe({
         next: created => {
           const oldId = food.id!;
           food.id = created.id;
