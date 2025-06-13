@@ -61,7 +61,6 @@ export class FoodService {
     return this.http.get<FoodResponse[]>(`${this.baseUrl}/my`);
   }
 
-  /** Elimina un alimento creado por mí */
   deleteMyFood(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
@@ -80,10 +79,6 @@ export class FoodService {
     return this.http.get<FoodResponse[]>(this.adminBase);
   }
 
-  /** Obtiene un alimento por ID (ADMIN) */
-  getOne(id: number): Observable<FoodResponse> {
-    return this.http.get<FoodResponse>(`${this.adminBase}/${id}`);
-  }
 
   /** Crea un alimento (ADMIN) */
   createAdmin(food: FoodRequest): Observable<FoodResponse> {

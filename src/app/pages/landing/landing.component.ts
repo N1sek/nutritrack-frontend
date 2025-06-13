@@ -5,9 +5,7 @@ import {NavbarComponent} from '../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
-  imports: [
-    NavbarComponent
-  ],
+  imports: [],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
   standalone: true

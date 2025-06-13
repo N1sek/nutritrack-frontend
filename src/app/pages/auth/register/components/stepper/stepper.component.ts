@@ -13,5 +13,5 @@ import {NgClass} from '@angular/common';
 export class StepperComponent {
   @Input() currentStep = 1;
 
-  steps = [1, 2, 3, 4]; // define los 4 pasos del wizard
+  steps = [1, 2, 3, 4];
 }

@@ -33,16 +33,13 @@ export class UserComponent implements OnInit {
   error: string | null     = null;
   success: string | null   = null;
 
-  // pestañas
   activeTab: 'info' | 'recipes' | 'foods' = 'info';
 
-  // cambio de contraseña
   showChangePwd = false;
   oldPassword = '';
   newPassword = '';
   confirmNewPassword = '';
 
-  // datos de secciones
   myRecipes: any[] = [];
   myFoods:    any[] = [];
 

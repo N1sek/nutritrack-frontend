@@ -1,4 +1,3 @@
-// src/app/core/auth/admin.guard.ts
 import { inject, Injectable } from '@angular/core';
 import {
   CanActivateFn,

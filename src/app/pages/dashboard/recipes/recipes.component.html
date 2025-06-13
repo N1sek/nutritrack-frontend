@@ -6,10 +6,8 @@
     </button>
   </h3>
 
-  <!-- Filtros -->
   <app-recipe-filters (filtersChanged)="applyFilters($event)"></app-recipe-filters>
 
-  <!-- Vista Grid -->
   @if (isGridView) {
     <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
       <div class="col">
@@ -46,7 +44,6 @@
     </div>
   }
 
-  <!-- Vista Lista -->
   @if (!isGridView) {
     <div class="d-flex flex-column">
       <div class="d-flex align-items-center border-bottom py-2">
@@ -75,7 +72,6 @@
     </div>
   }
 
-  <!-- Paginacion -->
   <nav class="mt-4 d-flex justify-content-center">
     <ul class="pagination">
       <li class="page-item" [class.disabled]="currentPage === 0">

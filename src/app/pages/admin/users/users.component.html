@@ -1,7 +1,6 @@
 <main class="container-xxl py-5">
   <h3 class="mb-4">👥 Gestión de Usuarios</h3>
 
-  <!-- Filtros: búsqueda y rol -->
   <div class="row g-3 mb-4">
     <div class="col-md-6">
       <input type="text"
@@ -22,14 +21,12 @@
     </div>
   </div>
 
-  <!-- Spinner mientras carga -->
   @if (loading) {
     <div class="text-center py-5">
       <div class="spinner-border"></div>
     </div>
   }
 
-  <!-- Tabla -->
   @if (!loading) {
     <table class="table table-hover">
       <thead class="table-light">
@@ -80,7 +77,6 @@
       </tbody>
     </table>
 
-    <!-- Paginador -->
     @if (totalPages > 1) {
       <nav aria-label="Paginación usuarios">
         <ul class="pagination justify-content-center">
@@ -100,7 +96,6 @@
     }
   }
 
-  <!-- Modal de confirmación -->
   <div #confirmModal class="modal fade" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -136,7 +131,6 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div #toast class="toast" role="alert" aria-live="polite" aria-atomic="true">
       <div class="toast-header">

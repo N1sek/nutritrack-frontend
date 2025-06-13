@@ -3,7 +3,6 @@
     <div class="col-lg-8">
       <h3 class="mb-4 text-center">⚙️ Ajustes de Perfil</h3>
 
-      <!-- alertas -->
       @if (error) {
         <div class="alert alert-danger">{{ error }}</div>
       }
@@ -11,7 +10,6 @@
         <div class="alert alert-success">{{ success }}</div>
       }
 
-      <!-- pestañas -->
       <ul class="nav nav-tabs mb-4">
         <li class="nav-item">
           <a class="nav-link" [class.active]="activeTab==='info'" (click)="selectTab('info')">Información</a>

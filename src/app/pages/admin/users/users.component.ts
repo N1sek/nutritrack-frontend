@@ -16,18 +16,14 @@ export class UsersComponent implements OnInit {
   users: AdminUser[] = [];
   loading = false;
 
-  // Paginación
   pageSize = 10;
   currentPage = 1;
 
-  // Filtros
   searchTerm = '';
   filterRole = '';
 
-  // Roles posibles
   roles = ['USER','MODERATOR','ADMIN'];
 
-  // Modal y Toast
   selectedUser: AdminUser | null = null;
   actionType: 'toggle' | 'delete' = 'delete';
   @ViewChild('confirmModal') confirmModalRef!: ElementRef<HTMLDivElement>;
@@ -51,7 +47,6 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  /** Devuelve sólo los usuarios que cumplen búsqueda y filtro */
   get filteredUsers(): AdminUser[] {
     return this.users
       .filter(u => {
@@ -63,7 +58,6 @@ export class UsersComponent implements OnInit {
       .filter(u => !this.filterRole || u.role === this.filterRole);
   }
 
-  /** Total de páginas tras filtrar */
   get totalPages(): number {
     return Math.ceil(this.filteredUsers.length / this.pageSize);
   }
@@ -72,7 +66,6 @@ export class UsersComponent implements OnInit {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
-  /** Usuarios de la página actual */
   get pagedUsers(): AdminUser[] {
     const start = (this.currentPage - 1) * this.pageSize;
     return this.filteredUsers.slice(start, start + this.pageSize);
@@ -83,14 +76,12 @@ export class UsersComponent implements OnInit {
     this.currentPage = n;
   }
 
-  /** Abrir modal de confirmación */
   confirmAction(u: AdminUser, action: 'toggle' | 'delete'): void {
     this.selectedUser = u;
     this.actionType = action;
     new Modal(this.confirmModalRef.nativeElement).show();
   }
 
-  /** Ejecutar acción tras confirmar */
   onConfirm(): void {
     if (!this.selectedUser) return;
     const u = this.selectedUser;
@@ -111,14 +102,12 @@ export class UsersComponent implements OnInit {
     modal.hide();
   }
 
-  /** Cambiar rol in-line */
   changeRole(u: AdminUser): void {
     this.adminService.updateRole(u.id, u.role).subscribe(() => {
       this.showToast(`Rol de ${u.nickname} cambiado a ${u.role}.`);
     });
   }
 
-  /** Mostrar toast con mensaje */
   private showToast(msg: string): void {
     this.toastMessage = msg;
     const toastEl = this.toastRef.nativeElement;

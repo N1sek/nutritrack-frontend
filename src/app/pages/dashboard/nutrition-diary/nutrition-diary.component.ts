@@ -80,11 +80,9 @@ export class NutritionDiaryComponent implements OnInit {
   }
 
   calcular(entry: any, prop: 'calories'|'protein'|'carbs'|'fat'): number {
-    // Si el mapper ya volcó customNutrition, lo usamos directamente
     if (entry[prop] != null) {
       return entry[prop];
     }
-    // Si no, calculamos a partir de food/recipe
     const item = entry.food || entry.recipe;
     const q = entry.quantity / 100;
     return Math.round((item?.[prop] || 0) * q * 100) / 100;

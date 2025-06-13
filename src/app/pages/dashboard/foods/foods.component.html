@@ -1,7 +1,6 @@
 <main class="container-xxl py-5">
   <h3 class="mb-4 text-center">🥗 Alimentos</h3>
 
-  <!-- búsqueda + crear -->
   <div class="row justify-content-center mb-4">
     <div class="col-md-8 d-flex gap-2">
       <input
@@ -17,7 +16,6 @@
     </div>
   </div>
 
-  <!-- formulario inline -->
   @if (showCreateForm) {
     <div class="row justify-content-center mb-4">
       <div class="col-md-8">
@@ -25,7 +23,6 @@
           <h5 class="mb-3">Crear nuevo alimento</h5>
           <form (ngSubmit)="createFood()">
             <div class="row g-3">
-              <!-- imagen -->
               <div class="col-12">
                 <label class="form-label">Imagen</label>
                 <input type="file" accept="image/*"
@@ -39,14 +36,12 @@
                   </div>
                 }
               </div>
-              <!-- nombre -->
               <div class="col-md-6">
                 <label class="form-label">Nombre *</label>
                 <input type="text" class="form-control"
                        required
                        [(ngModel)]="newFood.name" name="name" />
               </div>
-              <!-- nutricionales en fila -->
               <div class="col-12">
                 <div class="row g-3">
                   <div class="col-md-3">
@@ -87,21 +82,18 @@
     </div>
   }
 
-  <!-- spinner -->
   @if (loading) {
     <div class="text-center my-4">
       <div class="spinner-border text-primary"></div>
     </div>
   }
 
-  <!-- sin resultados -->
   @if (!loading && mergedResults.length === 0) {
     <div class="text-center text-muted my-4">
       No se encontraron alimentos.
     </div>
   }
 
-  <!-- lista -->
   @if (!loading && mergedResults.length > 0) {
     <div class="row justify-content-center">
       <div class="col-md-8">
@@ -114,7 +106,6 @@
                    style="width:48px;height:48px;object-fit:cover"
                    (error)="food.imageUrl='assets/img/no-image-food.png'" />
 
-              <!-- detalles -->
               <div class="flex-grow-1">
                 <strong>{{ food.name }}</strong>
                 <div class="small text-muted">
@@ -125,7 +116,6 @@
                 </div>
               </div>
 
-              <!-- añadir al diario -->
               <div class="d-flex align-items-center gap-2">
                 <select class="form-select form-select-sm"
                         [(ngModel)]="tempMealType[food.id]"

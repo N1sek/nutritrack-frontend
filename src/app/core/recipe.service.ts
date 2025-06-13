@@ -1,4 +1,3 @@
-// src/app/core/recipe.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
@@ -39,7 +38,6 @@ export class RecipeService {
 
   constructor(private http: HttpClient) {}
 
-  /** Sube un fichero de imagen y devuelve la URL pública */
   uploadImage(file: File): Observable<string> {
     const formData = new FormData();
     formData.append('image', file);
@@ -48,7 +46,6 @@ export class RecipeService {
       .pipe(map(response => response.url));
   }
 
-  /** Crea una receta (sin imagen, la URL debe venir subida antes) */
   createRecipe(recipeData: any): Observable<Recipe> {
     return this.http.post<Recipe>(this.baseUrl, recipeData);
   }
@@ -57,36 +54,30 @@ export class RecipeService {
     return this.http.get<Recipe[]>(`${this.baseUrl}/my`);
   }
 
-  /** Elimina una receta creada por mí */
   deleteMyRecipe(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  /** Obtiene todas las recetas (paginadas) */
   getAllRecipes(page = 0, size = 20): Observable<PaginatedRecipes> {
     return this.http.get<PaginatedRecipes>(
       `${this.baseUrl}?page=${page}&size=${size}`
     );
   }
 
-  /** Busca recetas por nombre */
   searchRecipes(query: string): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(
       `${this.baseUrl}/search?query=${encodeURIComponent(query)}`
     );
   }
 
-  /** Obtiene una receta por su ID */
   getRecipeById(id: number): Observable<Recipe> {
     return this.http.get<Recipe>(`${this.baseUrl}/${id}`);
   }
 
-  /** Obtiene recetas favoritas del usuario */
   getFavorites(): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(`${this.baseUrl}/favorites`);
   }
 
-  /** Marca o desmarca una receta como favorita */
   toggleFavorite(id: number): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${id}/favorite`, {});
   }
@@ -96,23 +87,9 @@ export class RecipeService {
     return this.http.get<Recipe[]>(this.adminBaseUrl);
   }
 
-  /** Obtiene una receta por ID (ADMIN) */
-  getOneAdmin(id: number): Observable<Recipe> {
-    return this.http.get<Recipe>(`${this.adminBaseUrl}/${id}`);
-  }
-
-  /** Crea una receta (ADMIN) */
-  createAdmin(recipeData: any): Observable<Recipe> {
-    return this.http.post<Recipe>(this.adminBaseUrl, recipeData);
-  }
-
   /** Actualiza una receta (ADMIN) */
   updateAdmin(id: number, recipeData: any): Observable<Recipe> {
     return this.http.put<Recipe>(`${this.adminBaseUrl}/${id}`, recipeData);
   }
 
-  /** Elimina una receta (ADMIN) */
-  deleteAdmin(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.adminBaseUrl}/${id}`);
-  }
 }

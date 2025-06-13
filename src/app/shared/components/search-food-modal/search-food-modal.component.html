@@ -7,7 +7,6 @@
       </div>
       <div class="modal-body pt-1">
 
-        <!-- Modo y cantidad -->
         <div class="d-flex justify-content-between align-items-center mb-3">
           <div class="btn-group">
             <button
@@ -24,7 +23,6 @@
             </button>
           </div>
 
-          <!-- aquí el nuevo dropdown de unidad -->
           <div class="input-group input-group-sm w-auto" style="max-width: 180px;">
             <input
               type="number"
@@ -43,7 +41,6 @@
           </div>
         </div>
 
-        <!-- Campo de búsqueda -->
         <input
           type="text"
           class="form-control mb-3"
@@ -51,7 +48,6 @@
           [(ngModel)]="query"
           (ngModelChange)="onSearchChange()">
 
-        <!-- Spinner de “cargando más” -->
         @if (mode === 'food' && loadingExternal && mergedResults.length > 0) {
           <div class="text-center mb-3">
             <div class="spinner-border text-primary" role="status"></div>
@@ -59,7 +55,6 @@
           </div>
         }
 
-        <!-- Lista de resultados -->
         <div class="list-group">
           @for (item of (mode === 'food' ? mergedResults : recipeResults); track item.name + '-' + (item.imageUrl || '')) {
             <div
@@ -87,7 +82,6 @@
             </div>
           }
 
-          <!-- Cargar más -->
           @if (mode === 'food'
           && !loadingExternal
           && hasMoreExternal
@@ -102,7 +96,6 @@
           }
         </div>
 
-        <!-- Mensajes de “no resultados” -->
         @if (mode === 'food'
         && !loadingExternal
         && mergedResults.length === 0

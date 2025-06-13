@@ -21,14 +21,12 @@ export class SearchFoodModalComponent {
     unit: 'g' | 'ml';
   }>();
 
-  // estado del buscador
   query = '';
   quantity = 100;
   unit: 'g' | 'ml' = 'g';
   mealType = '';
   mode: 'food' | 'recipe' = 'food';
 
-  // resultados
   localResults: any[] = [];
   externalResults: any[] = [];
   mergedResults: any[] = [];
